@@ -5,14 +5,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Constants {
-    @Value("${steam.id.nene}")
-	public String NENE_STEAM_ID;
-	@Value("${steam.id.shinchan}")
-	public String SHINCHAN_STEAM_ID;
-	@Value("${steam.id.mafios}")
-	public String MAFIOS_STEAM_ID;
-	@Value("${steam.id.swagchan}")
-	public String SWAGCHAN_STEAM_ID;
-    @Value("${steam.id.kazama}")
-	public String KAZAMA_STEAM_ID;
+
+	public String NENE_STEAM_ID = "76561198009962148";
+
+	public String SHINCHAN_STEAM_ID = "76561197969326379";
+
+	public String MAFIOS_STEAM_ID = "76561198010914876";
+
+	public String SWAGCHAN_STEAM_ID = "76561198158839442";
+
+	public String KAZAMA_STEAM_ID = "76561198020496882";
 }

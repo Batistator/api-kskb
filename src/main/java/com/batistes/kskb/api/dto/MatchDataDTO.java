@@ -24,6 +24,8 @@ public class MatchDataDTO {
     private String map;
     
     private Double duration;
+
+    private String durationString;
     
     private Integer teamAScore;
     

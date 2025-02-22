@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -15,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.batistes.kskb.api.repository.MatchesRepository;
+import com.batistes.kskb.api.util.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.batistes.kskb.api.controller.AuthController;
 import com.batistes.kskb.api.dto.DashboardDTO;
@@ -31,12 +31,12 @@ public class DashboardService {
 
     public String getDashboardData(Date startDate, Date endDate){
 
-        final List<MatchDataDTO> matchList = matchesRepository.getMatchList(convertUtilDateToSqlDate(startDate), convertUtilDateToSqlDate(endDate));
+        final List<MatchDataDTO> matchList = matchesRepository.getMatchList(Utils.convertUtilDateToSqlDate(startDate), Utils.convertUtilDateToSqlDate(endDate));
         
         final Integer wins = countMatchResult(matchList, "Victoria");
         final Integer loses = countMatchResult(matchList, "Derrota");
         final Integer ties = countMatchResult(matchList, "Empate");
-        final Integer noBestShinchanMatches = matchesRepository.findMatchesNoFirst(convertUtilDateToSqlDate(startDate), convertUtilDateToSqlDate(endDate), "ShinChan");
+        final Integer noBestShinchanMatches = matchesRepository.findMatchesNoFirst(Utils.convertUtilDateToSqlDate(startDate), Utils.convertUtilDateToSqlDate(endDate), "ShinChan");
         final Integer totalMatches = matchList.size();
         Double winRate = 0.0;
         Double noLoseRate = 0.0;
@@ -72,20 +72,6 @@ public class DashboardService {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             return objectMapper.writeValueAsString(dashboardDTO);
-        } catch (Exception e) {
-            logger.error("Error parsing JSON", e);
-            return null;
-        }
-    }
-
-    public String getMatchListData(Date startDate, Date endDate){
-        final List<MatchDataDTO> matchList = matchesRepository.getMatchList(convertUtilDateToSqlDate(startDate), convertUtilDateToSqlDate(endDate));
-
-        calculateWeekDay(matchList);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            return objectMapper.writeValueAsString(matchList);
         } catch (Exception e) {
             logger.error("Error parsing JSON", e);
             return null;
@@ -144,24 +130,6 @@ public class DashboardService {
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
                 .orElse(null);
-    }
-
-    private static void calculateWeekDay(List<MatchDataDTO> matchList) {
-        Locale locale = new Locale.Builder().setLanguage("es").setRegion("ES").build();
-        SimpleDateFormat sdf = new SimpleDateFormat("EEEE", locale);
-        
-        matchList.forEach(match -> {
-            Date date = match.getDate();
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(date);
-            cal.add(Calendar.HOUR, -3);
-            Date dateMinus3Hours = cal.getTime();
-
-            sdf.setTimeZone(TimeZone.getTimeZone("Europe/Madrid")); // Ajustar a la zona horaria adecuada si es necesario
-            String weekDay = sdf.format(dateMinus3Hours);
-
-            match.setWeekDay(weekDay);
-        });
     }
 
     private static Integer getDaysOf(List<MatchDataDTO> matchList, String matchResult){
@@ -244,7 +212,4 @@ public class DashboardService {
         return currentStreak;
     }
 
-    private static java.sql.Date convertUtilDateToSqlDate(Date utilDate) {
-        return new java.sql.Date(utilDate.getTime());
-    }
 }

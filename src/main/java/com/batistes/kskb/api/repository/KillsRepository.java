@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface KillsRepository extends JpaRepository<Kills, Long> {
-    
+    public Integer countKillsByKillerName(String player);
 }
