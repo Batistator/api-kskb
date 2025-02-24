@@ -1,5 +1,5 @@
 -- Definir variable en DBeaver
-@set year_input = 2023;
+@set year_input = 2023; 
 
 
 select 

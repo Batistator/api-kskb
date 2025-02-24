@@ -69,13 +69,13 @@ public class Kills {
     @Column(nullable = false)
     private Integer penetratedObjects;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "killer_x")
     private Double killerX;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "killer_y")
     private Double killerY;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "killer_z")
     private Double killerZ;
 
     @Column(nullable = false)
@@ -84,13 +84,13 @@ public class Kills {
     @Column(nullable = false)
     private boolean isKillerBlinded;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "victim_x")
     private Double victimX;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "victim_y")
     private Double victimY;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "victim_z")
     private Double victimZ;
 
     @Column(nullable = false)
@@ -102,13 +102,13 @@ public class Kills {
     @Column(nullable = false)
     private boolean isVictimInspectingWeapon;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "assister_x")
     private Double assisterX;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "assister_y")
     private Double assisterY;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "assister_z")
     private Double assisterZ;
 
     @Column(nullable = false)

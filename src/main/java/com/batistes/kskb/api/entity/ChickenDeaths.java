@@ -25,7 +25,7 @@ public class ChickenDeaths {
     private Integer frame;
 
     @Column(nullable = false)
-    private String killerStreamId;
+    private String killerSteamId;
 
     @Column(nullable = false)
     private String weaponName;

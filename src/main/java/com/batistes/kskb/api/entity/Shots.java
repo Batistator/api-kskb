@@ -57,13 +57,13 @@ public class Shots {
     @Column(nullable = false)
     private Double z;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "player_velocity_x")
     private Double playerVelocityX;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "player_velocity_y")
     private Double playerVelocityY;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "player_velocity_z")
     private Double playerVelocityZ;
 
     @Column(nullable = false)
@@ -75,15 +75,15 @@ public class Shots {
     @Column(nullable = false)
     private Double recoilIndex;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "aim_punch_angle_x")
     private Double aimPunchAngleX;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "aim_punch_angle_y")
     private Double aimPunchAngleY;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "view_punch_angle_x")
     private Double viewPunchAngleX;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "view_punch_angle_y")
     private Double viewPunchAngleY;
 }

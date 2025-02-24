@@ -46,7 +46,7 @@ public class Damages {
     private boolean isVictimControllingBot;
 
     @Column(nullable = false)
-    private Integer hitGroup;
+    private Integer hitgroup;
 
     @Column(nullable = false)
     private String weaponName;
