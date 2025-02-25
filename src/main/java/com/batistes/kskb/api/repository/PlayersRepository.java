@@ -2,6 +2,7 @@ package com.batistes.kskb.api.repository;
 
 import com.batistes.kskb.api.entity.Players;
 
+import java.sql.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,5 +17,6 @@ public interface PlayersRepository extends JpaRepository<Players, Long> {
 
     List<Players> findPlayersByName(String name);
 
-    public List<Players> findByNameIn(List<String>players);
+    @Query("SELECT p FROM Players p JOIN Matches m ON p.matchChecksum = m.checksum WHERE m.date BETWEEN :startDate AND :endDate AND (p.name IN :players)")
+    public List<Players> findByNameInBetweenDates(List<String>players, Date startDate, Date endDate);
 }

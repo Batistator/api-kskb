@@ -1,10 +1,12 @@
 package com.batistes.kskb.api.service;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,13 +78,16 @@ public class TotalDataService {
     @Autowired
     private GrenadeBouncesRepository grenadeBouncesRepository;
 
+    //TODO: Optimizar método de obtención de datos.
+
     public String getTotalData(Date startDate, Date endDate){
 
         final Logger logger = LoggerFactory.getLogger(AuthController.class);
         
         logger.info("Data retrieve start");
-        List<Players> players = playersRepository.findByNameIn(
-            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN));
+        List<Players> players = playersRepository.findByNameInBetweenDates(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            startDate, endDate);
 
         logger.info("Players data Finished");
         List<Kills> kills = killsRepository.findByKillerNameOrAssisterNameOrVictimNameBetweenDates(
@@ -90,40 +95,49 @@ public class TotalDataService {
             startDate, endDate);
 
         logger.info("Kills data Finished");        
-        List<BombsDefused> bombsDefused = bombsDefusedRepository.findByDefuserNameIn(
-            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN));
+        List<BombsDefused> bombsDefused = bombsDefusedRepository.findByDefuserNameInBetweenDates(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            startDate, endDate);
         
         logger.info("Bombs defused data Finished");     
-        List<BombsPlanted> bombsPlanted = bombsPlantedRepository.findByPlanterNameIn(
-            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN));
+        List<BombsPlanted> bombsPlanted = bombsPlantedRepository.findByPlanterNameInBetweenDates(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            startDate, endDate);
         
         logger.info("Bombs planted data Finished");
-        List<GrenadeProjectilesDestroy> grenades = grenadeProjectilesDestroyRepository.findByThrowerNameIn(
-            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN));
+        List<GrenadeProjectilesDestroy> grenades = grenadeProjectilesDestroyRepository.findByThrowerNameInBetweenDates(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            startDate, endDate);
         
         logger.info("Grenade projectile destroy data Finished");
-        List<PlayerEconomies> playerEconomies = playerEconomiesRepository.findByPlayerNameIn(
-            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN));
+        List<PlayerEconomies> playerEconomies = playerEconomiesRepository.findByPlayerNameInBetweenDates(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            startDate, endDate);
   
         logger.info("Player economies data Finished");  
-        List<Shots> shots = shotsRepository.findByPlayerNameIn(
-            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN));
+        List<Shots> shots = shotsRepository.findByPlayerNameInBetweenDates(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            startDate, endDate);
         
         logger.info("Shots data Finished");
-        List<ChickenDeaths> chickenDeaths = chickenDeathsRepository.findByKillerSteamIdIn(
-            Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID));
+        List<ChickenDeaths> chickenDeaths = chickenDeathsRepository.findByKillerSteamIdInBetweenDates(
+            Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID),
+            startDate, endDate);
         
         logger.info("Chicken deaths data Finished");        
-        List<PlayerBlinds> playerBlinds = playerBlindsRepository.findByKillerNameOrAssisterNameOrVictimName(
-            Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID));
+        List<PlayerBlinds> playerBlinds = playerBlindsRepository.findByKillerNameOrAssisterNameOrVictimNameBetweenDates(
+            Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID),
+            startDate, endDate);
         
         logger.info("Player blinds data Finished");
-        List<Damages> damages = damagesRepository.findByAttackerSteamIdOrVictimSteamIdIn(
-            Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID));
+        List<Damages> damages = damagesRepository.findByAttackerSteamIdOrVictimSteamIdInBetweenDates(
+            Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID),
+            startDate, endDate);
         
         logger.info("Damages data Finished");
-        List<GrenadeBounces> grenadeBounces = grenadeBouncesRepository.findByThrowerNameIn(
-            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN));
+        List<GrenadeBounces> grenadeBounces = grenadeBouncesRepository.findByThrowerNameInBetweenDates(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            startDate, endDate);
         logger.info("Grenade bounces data Finished");
 
         logger.info("SQL Finished");
@@ -144,9 +158,16 @@ public class TotalDataService {
 
         logger.info("Java process Finished");
         
+        List<TotalDataDTO> totalDataList = new ArrayList<>();
+        for (Entry<String, TotalDataDTO> entry : totalData.entrySet()) {
+            TotalDataDTO dto = entry.getValue();
+            dto.setData(entry.getKey());
+            totalDataList.add(dto);
+        }
+
         String jsonResult = "";
         try {
-            jsonResult = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(totalData);
+            jsonResult = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(totalDataList);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return "Error de conversión JSON";

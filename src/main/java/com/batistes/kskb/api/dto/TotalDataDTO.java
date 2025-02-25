@@ -12,6 +12,8 @@ public class TotalDataDTO {
     
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
     
+    private String data;
+    
     private String icon;
     
     private String shinchan;
