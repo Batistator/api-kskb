@@ -180,7 +180,7 @@ public class TotalDataService {
         Map<String, TotalDataDTO> blindsMap = new HashMap<>();
 
         TotalDataDTO blinds = new TotalDataDTO();
-        blinds.setIcon("./icons/total_data/flash_enemies.png");
+        blinds.setIcon("/icons/total_data/flash_enemies.png");
         blinds.setShinchan(String.valueOf(totalBlinds.stream()
             .filter(blind -> constants.PLAYER_SHINCHAN.equals(blind.getFlasherName()) && !Arrays.asList(
                 constants.PLAYER_SWAGCHAN, 
@@ -219,7 +219,7 @@ public class TotalDataService {
         blindsMap.put("Enemigos flasheados", blinds);
 
         blinds = new TotalDataDTO();
-        blinds.setIcon("./icons/total_data/flash_allies.png");
+        blinds.setIcon("/icons/total_data/flash_allies.png");
         blinds.setShinchan(String.valueOf(totalBlinds.stream()
             .filter(blind -> constants.PLAYER_SHINCHAN.equals(blind.getFlasherName()) && Arrays.asList(
                 constants.PLAYER_SWAGCHAN, 
@@ -258,7 +258,7 @@ public class TotalDataService {
         blindsMap.put("Aliados flasheados", blinds);
 
         blinds = new TotalDataDTO();
-        blinds.setIcon("./icons/total_data/max_blind.png");
+        blinds.setIcon("/icons/total_data/max_blind.png");
         blinds.setShinchan(String.valueOf(totalBlinds.stream()
             .filter(blind -> constants.PLAYER_SHINCHAN.equals(blind.getFlasherName()) && !Arrays.asList(
                 constants.PLAYER_SWAGCHAN, 
@@ -267,7 +267,7 @@ public class TotalDataService {
                 constants.PLAYER_MAFIOS).contains(blind.getFlashedName()))
             .mapToDouble(PlayerBlinds::getDuration)
             .max()
-            .orElse(0)));
+            .orElse(0)).replace(".",","));
         blinds.setKazama(String.valueOf(totalBlinds.stream()
             .filter(blind -> constants.PLAYER_KAZAMA.equals(blind.getFlasherName()) && !Arrays.asList(
                 constants.PLAYER_SWAGCHAN, 
@@ -276,7 +276,7 @@ public class TotalDataService {
                 constants.PLAYER_MAFIOS).contains(blind.getFlashedName()))
             .mapToDouble(PlayerBlinds::getDuration)
             .max()
-            .orElse(0)));
+            .orElse(0)).replace(".",","));
         blinds.setMafios(String.valueOf(totalBlinds.stream()
             .filter(blind -> constants.PLAYER_MAFIOS.equals(blind.getFlasherName()) && !Arrays.asList(
                 constants.PLAYER_SWAGCHAN, 
@@ -285,7 +285,7 @@ public class TotalDataService {
                 constants.PLAYER_SHINCHAN).contains(blind.getFlashedName()))
             .mapToDouble(PlayerBlinds::getDuration)
             .max()
-            .orElse(0)));
+            .orElse(0)).replace(".",","));
         blinds.setNene(String.valueOf(totalBlinds.stream()
             .filter(blind -> constants.PLAYER_NENE.equals(blind.getFlasherName()) && !Arrays.asList(
                 constants.PLAYER_SWAGCHAN, 
@@ -294,7 +294,7 @@ public class TotalDataService {
                 constants.PLAYER_MAFIOS).contains(blind.getFlashedName()))
             .mapToDouble(PlayerBlinds::getDuration)
             .max()
-            .orElse(0)));
+            .orElse(0)).replace(".",","));
         blinds.setSwagchan(String.valueOf(totalBlinds.stream()
             .filter(blind -> constants.PLAYER_SWAGCHAN.equals(blind.getFlasherName()) && !Arrays.asList(
                 constants.PLAYER_NENE, 
@@ -303,7 +303,7 @@ public class TotalDataService {
                 constants.PLAYER_MAFIOS).contains(blind.getFlashedName()))
             .mapToDouble(PlayerBlinds::getDuration)
             .max()
-            .orElse(0)));
+            .orElse(0)).replace(".",","));
         blindsMap.put("Máximo flasheo (seg)", blinds);
 
         return blindsMap;
@@ -313,7 +313,7 @@ public class TotalDataService {
         Map<String, TotalDataDTO> damagesMap = new HashMap<>();
         
         TotalDataDTO damages = new TotalDataDTO();
-        damages.setIcon("./icons/total_data/ally_damage.png"); 
+        damages.setIcon("/icons/total_data/ally_damage.png"); 
         damages.setShinchan(String.valueOf(totalDamages.stream()
             .filter(damage -> constants.SHINCHAN_STEAM_ID.equals(damage.getAttackerSteamId()) &&
             Arrays.asList(constants.SWAGCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID).contains(damage.getVictimSteamId()))
@@ -343,7 +343,7 @@ public class TotalDataService {
         Map<String, TotalDataDTO> bouncesMap = new HashMap<>();
 
         TotalDataDTO bounces = new TotalDataDTO();
-        bounces.setIcon("./icons/total_data/bounces.png");
+        bounces.setIcon("/icons/total_data/bounces.png");
         bounces.setShinchan(String.valueOf(totalgrenadeBounces.stream()
             .filter(bounce -> constants.PLAYER_SHINCHAN.equals(bounce.getThrowerName()))
             .count()));
@@ -368,7 +368,7 @@ public class TotalDataService {
         Map<String, TotalDataDTO> chickenMap = new HashMap<>();
 
         TotalDataDTO chickens = new TotalDataDTO();
-        chickens.setIcon("./icons/total_data/chicken_deaths.png");
+        chickens.setIcon("/icons/total_data/chicken_deaths.png");
         chickens.setShinchan(String.valueOf(totalChickenDeaths.stream()
             .filter(chicken -> constants.SHINCHAN_STEAM_ID.equals(chicken.getKillerSteamId()))
             .count()));
@@ -393,7 +393,7 @@ public class TotalDataService {
         Map<String, TotalDataDTO> shotsMap = new HashMap<>();
 
         TotalDataDTO shots = new TotalDataDTO();
-        shots.setIcon("./icons/total_data/shots.png");
+        shots.setIcon("/icons/total_data/shots.png");
         shots.setShinchan(String.valueOf(totalShots.stream()
             .filter(shot -> constants.PLAYER_SHINCHAN.equals(shot.getPlayerName()))
             .count()));
@@ -412,7 +412,7 @@ public class TotalDataService {
         shotsMap.put("Disparos", shots);
 
         TotalDataDTO precision = new TotalDataDTO();
-        precision.setIcon("./icons/total_data/precision.png");
+        precision.setIcon("/icons/total_data/precision.png");
         precision.setShinchan(String.format("%.2f",
             Double.valueOf(totalDamages.stream()
             .filter(damage -> constants.SHINCHAN_STEAM_ID.equals(damage.getAttackerSteamId()) && 
@@ -442,22 +442,22 @@ public class TotalDataService {
         Map<String, TotalDataDTO> economiesMap = new HashMap<>();
         
         TotalDataDTO economies = new TotalDataDTO();
-        economies.setIcon("./icons/total_data/money_spent.png");
-        economies.setShinchan(String.valueOf(totalEconomies.stream()
+        economies.setIcon("/icons/total_data/money_spent.png");
+        economies.setShinchan(String.format("%,d", totalEconomies.stream()
             .filter(economy -> constants.PLAYER_SHINCHAN.equals(economy.getPlayerName()))
-            .mapToInt(PlayerEconomies::getMoneySpent).sum()));
-        economies.setKazama(String.valueOf(totalEconomies.stream()
+            .mapToInt(PlayerEconomies::getMoneySpent).sum())+" $");
+        economies.setKazama(String.format("%,d", totalEconomies.stream()
             .filter(economy -> constants.PLAYER_KAZAMA.equals(economy.getPlayerName()))
-            .mapToInt(PlayerEconomies::getMoneySpent).sum()));
-        economies.setMafios(String.valueOf(totalEconomies.stream()
+            .mapToInt(PlayerEconomies::getMoneySpent).sum())+" $");
+        economies.setMafios(String.format("%,d", totalEconomies.stream()
             .filter(economy -> constants.PLAYER_MAFIOS.equals(economy.getPlayerName()))
-            .mapToInt(PlayerEconomies::getMoneySpent).sum()));
-        economies.setNene(String.valueOf(totalEconomies.stream()
+            .mapToInt(PlayerEconomies::getMoneySpent).sum())+" $");
+        economies.setNene(String.format("%,d", totalEconomies.stream()
             .filter(economy -> constants.PLAYER_NENE.equals(economy.getPlayerName()))
-            .mapToInt(PlayerEconomies::getMoneySpent).sum()));
-        economies.setSwagchan(String.valueOf(totalEconomies.stream()
+            .mapToInt(PlayerEconomies::getMoneySpent).sum())+" $");
+        economies.setSwagchan(String.format("%,d", totalEconomies.stream()
             .filter(economy -> constants.PLAYER_SWAGCHAN.equals(economy.getPlayerName()))
-            .mapToInt(PlayerEconomies::getMoneySpent).sum()));
+            .mapToInt(PlayerEconomies::getMoneySpent).sum())+" $");
         economiesMap.put("Dinero gastado", economies);
         
         return economiesMap;
@@ -467,7 +467,7 @@ public class TotalDataService {
         Map<String, TotalDataDTO> grenadesMap = new HashMap<>();
 
         TotalDataDTO flashes = new TotalDataDTO();
-        flashes.setIcon("./icons/total_data/flashes.png");
+        flashes.setIcon("/icons/total_data/flashes.png");
         flashes.setShinchan(String.valueOf(totalGrenades.stream()
             .filter(flash -> constants.PLAYER_SHINCHAN.equals(flash.getThrowerName()) && "Flashbang".equals(flash.getGrenadeName()))
             .count()));
@@ -486,7 +486,7 @@ public class TotalDataService {
         grenadesMap.put("Flashes lanzadas", flashes);
 
         TotalDataDTO smokes = new TotalDataDTO();
-        smokes.setIcon("./icons/total_data/smokes.png");
+        smokes.setIcon("/icons/total_data/smokes.png");
         smokes.setShinchan(String.valueOf(totalGrenades.stream()
             .filter(smoke -> constants.PLAYER_SHINCHAN.equals(smoke.getThrowerName()) && "Smoke Grenade".equals(smoke.getGrenadeName()))
             .count()));
@@ -505,7 +505,7 @@ public class TotalDataService {
         grenadesMap.put("Humos lanzados", smokes);
 
         TotalDataDTO hes = new TotalDataDTO();
-        hes.setIcon("./icons/total_data/he_grenades.png");
+        hes.setIcon("/icons/total_data/he_grenades.png");
         hes.setShinchan(String.valueOf(totalGrenades.stream()
             .filter(he -> constants.PLAYER_SHINCHAN.equals(he.getThrowerName()) && "HE Grenade".equals(he.getGrenadeName()))
             .count()));
@@ -524,7 +524,7 @@ public class TotalDataService {
         grenadesMap.put("HEs lanzadas", hes);
 
         TotalDataDTO decoys = new TotalDataDTO();
-        decoys.setIcon("./icons/total_data/decoys.png");
+        decoys.setIcon("/icons/total_data/decoys.png");
         decoys.setShinchan(String.valueOf(totalGrenades.stream()
             .filter(decoy -> constants.PLAYER_SHINCHAN.equals(decoy.getThrowerName()) && "Decoy Grenade".equals(decoy.getGrenadeName()))
             .count()));
@@ -543,7 +543,7 @@ public class TotalDataService {
         grenadesMap.put("Decoys lanzadas", decoys);
 
         TotalDataDTO molotovs = new TotalDataDTO();
-        molotovs.setIcon("./icons/total_data/molotovs.png");
+        molotovs.setIcon("/icons/total_data/molotovs.png");
         molotovs.setShinchan(String.valueOf(totalGrenades.stream()
             .filter(molotov -> constants.PLAYER_SHINCHAN.equals(molotov.getThrowerName()) && Arrays.asList("Molotov","Incendiary Grenade").contains(molotov.getGrenadeName()))
             .count()));
@@ -568,7 +568,7 @@ public class TotalDataService {
         Map<String, TotalDataDTO> bombsDefusedMap = new HashMap<>();
 
         TotalDataDTO bombsDefused = new TotalDataDTO();
-        bombsDefused.setIcon("./icons/total_data/defuses.png");
+        bombsDefused.setIcon("/icons/total_data/defuses.png");
         bombsDefused.setShinchan(String.valueOf(totalBombsDefused.stream()
             .filter(bombDefused -> constants.PLAYER_SHINCHAN.equals(bombDefused.getDefuserName()))
             .count()));
@@ -593,7 +593,7 @@ public class TotalDataService {
         Map<String, TotalDataDTO> bombsPlantedMap = new HashMap<>();
 
         TotalDataDTO bombsPlanted = new TotalDataDTO();
-        bombsPlanted.setIcon("./icons/total_data/c4_plants.png");
+        bombsPlanted.setIcon("/icons/total_data/c4_plants.png");
         bombsPlanted.setShinchan(String.valueOf(totalBombsPlanted.stream()
             .filter(bombPlanted -> constants.PLAYER_SHINCHAN.equals(bombPlanted.getPlanterName()))
             .count()));
@@ -618,7 +618,7 @@ public class TotalDataService {
         Map<String, TotalDataDTO> playersMap = new HashMap<>();
 
         TotalDataDTO players = new TotalDataDTO();
-        players.setIcon("./icons/total_data/mvps.png");
+        players.setIcon("/icons/total_data/mvps.png");
         players.setShinchan(String.valueOf(totalPlayers.stream()
             .filter(player -> constants.PLAYER_SHINCHAN.equals(player.getName()))
             .mapToInt(Players::getMvpCount).sum()));
@@ -637,7 +637,7 @@ public class TotalDataService {
         playersMap.put("MVPs", players);
 
         players = new TotalDataDTO();
-        players.setIcon("./icons/total_data/entry_kills.png");
+        players.setIcon("/icons/total_data/entry_kills.png");
         players.setShinchan(String.valueOf(totalPlayers.stream()
             .filter(player -> constants.PLAYER_SHINCHAN.equals(player.getName()))
             .mapToInt(Players::getFirstKillCount).sum()));
@@ -656,7 +656,7 @@ public class TotalDataService {
         playersMap.put("Entry kills", players);
 
         players = new TotalDataDTO();
-        players.setIcon("./icons/total_data/health_damage.png");
+        players.setIcon("/icons/total_data/health_damage.png");
         players.setShinchan(String.valueOf(totalPlayers.stream()
             .filter(player -> constants.PLAYER_SHINCHAN.equals(player.getName()))
             .mapToInt(Players::getDamageHealth).sum()));
@@ -675,7 +675,7 @@ public class TotalDataService {
         playersMap.put("Daño a vida", players);
 
         players = new TotalDataDTO();
-        players.setIcon("./icons/total_data/armor_damage.png");
+        players.setIcon("/icons/total_data/armor_damage.png");
         players.setShinchan(String.valueOf(totalPlayers.stream()
             .filter(player -> constants.PLAYER_SHINCHAN.equals(player.getName()))
             .mapToInt(Players::getDamageArmor).sum()));
@@ -694,7 +694,7 @@ public class TotalDataService {
         playersMap.put("Daño a armadura", players);
 
         players = new TotalDataDTO();
-        players.setIcon("./icons/total_data/5k.png");
+        players.setIcon("/icons/total_data/5k.png");
         players.setShinchan(String.valueOf(totalPlayers.stream()
             .filter(player -> constants.PLAYER_SHINCHAN.equals(player.getName()))
             .mapToInt(Players::getFiveKillCount).sum()));
@@ -713,7 +713,7 @@ public class TotalDataService {
         playersMap.put("5K", players);
 
         players = new TotalDataDTO();
-        players.setIcon("./icons/total_data/4k.png");
+        players.setIcon("/icons/total_data/4k.png");
         players.setShinchan(String.valueOf(totalPlayers.stream()
             .filter(player -> constants.PLAYER_SHINCHAN.equals(player.getName()))
             .mapToInt(Players::getFourKillCount).sum()));
@@ -732,7 +732,7 @@ public class TotalDataService {
         playersMap.put("4K", players);
 
         players = new TotalDataDTO();
-        players.setIcon("./icons/total_data/3k.png");
+        players.setIcon("/icons/total_data/3k.png");
         players.setShinchan(String.valueOf(totalPlayers.stream()
             .filter(player -> constants.PLAYER_SHINCHAN.equals(player.getName()))
             .mapToInt(Players::getThreeKillCount).sum()));
@@ -751,7 +751,7 @@ public class TotalDataService {
         playersMap.put("3K", players);
 
         players = new TotalDataDTO();
-        players.setIcon("./icons/total_data/2k.png");
+        players.setIcon("/icons/total_data/2k.png");
         players.setShinchan(String.valueOf(totalPlayers.stream()
             .filter(player -> constants.PLAYER_SHINCHAN.equals(player.getName()))
             .mapToInt(Players::getTwoKillCount).sum()));
@@ -770,7 +770,7 @@ public class TotalDataService {
         playersMap.put("2K", players);
 
         players = new TotalDataDTO();
-        players.setIcon("./icons/total_data/1k.png");
+        players.setIcon("/icons/total_data/1k.png");
         players.setShinchan(String.valueOf(totalPlayers.stream()
             .filter(player -> constants.PLAYER_SHINCHAN.equals(player.getName()))
             .mapToInt(Players::getOneKillCount).sum()));
@@ -789,27 +789,27 @@ public class TotalDataService {
         playersMap.put("1K", players);
 
         players = new TotalDataDTO();
-        players.setIcon("./icons/total_data/kast.png");
+        players.setIcon("/icons/total_data/kast.png");
         players.setShinchan(String.format("%.2f",
         totalPlayers.stream().filter(player -> constants.PLAYER_SHINCHAN.equals(player.getName()))
             .mapToDouble(Players::getKast).sum() /
-        totalPlayers.stream().filter(player -> constants.PLAYER_SHINCHAN.equals(player.getName())).count()));
+        totalPlayers.stream().filter(player -> constants.PLAYER_SHINCHAN.equals(player.getName())).count())+"%");
         players.setKazama(String.format("%.2f",
         totalPlayers.stream().filter(player -> constants.PLAYER_KAZAMA.equals(player.getName()))
             .mapToDouble(Players::getKast).sum() /
-        totalPlayers.stream().filter(player -> constants.PLAYER_KAZAMA.equals(player.getName())).count()));
+        totalPlayers.stream().filter(player -> constants.PLAYER_KAZAMA.equals(player.getName())).count())+"%");
         players.setMafios(String.format("%.2f",
         totalPlayers.stream().filter(player -> constants.PLAYER_MAFIOS.equals(player.getName()))
             .mapToDouble(Players::getKast).sum() /
-        totalPlayers.stream().filter(player -> constants.PLAYER_MAFIOS.equals(player.getName())).count()));
+        totalPlayers.stream().filter(player -> constants.PLAYER_MAFIOS.equals(player.getName())).count())+"%");
         players.setNene(String.format("%.2f",
         totalPlayers.stream().filter(player -> constants.PLAYER_NENE.equals(player.getName()))
             .mapToDouble(Players::getKast).sum() /
-        totalPlayers.stream().filter(player -> constants.PLAYER_NENE.equals(player.getName())).count()));
+        totalPlayers.stream().filter(player -> constants.PLAYER_NENE.equals(player.getName())).count())+"%");
         players.setSwagchan(String.format("%.2f",
         totalPlayers.stream().filter(player -> constants.PLAYER_SWAGCHAN.equals(player.getName()))
             .mapToDouble(Players::getKast).sum() /
-        totalPlayers.stream().filter(player -> constants.PLAYER_SWAGCHAN.equals(player.getName())).count()));
+        totalPlayers.stream().filter(player -> constants.PLAYER_SWAGCHAN.equals(player.getName())).count())+"%");
         playersMap.put("% KAST", players);
 
         return playersMap;
@@ -820,7 +820,7 @@ public class TotalDataService {
         Map<String, TotalDataDTO> killsMap = new HashMap<>();
         
         TotalDataDTO kills = new TotalDataDTO();
-        kills.setIcon("./icons/total_data/kills.png"); 
+        kills.setIcon("/icons/total_data/kills.png"); 
         kills.setShinchan(String.valueOf(totalKills.stream()
             .filter(kill -> constants.PLAYER_SHINCHAN.equals(kill.getKillerName()) && !constants.PLAYER_SHINCHAN.equals(kill.getVictimName()))
             .count()));
@@ -839,7 +839,7 @@ public class TotalDataService {
         killsMap.put("Eliminaciones", kills);
 
         kills = new TotalDataDTO();
-        kills.setIcon("./icons/total_data/assists.png");
+        kills.setIcon("/icons/total_data/assists.png");
         kills.setShinchan(String.valueOf(totalKills.stream()
             .filter(kill -> constants.PLAYER_SHINCHAN.equals(kill.getAssisterName()))
             .count()));
@@ -858,7 +858,7 @@ public class TotalDataService {
         killsMap.put("Asistencias", kills);
 
         kills = new TotalDataDTO();
-        kills.setIcon("./icons/total_data/deaths.png");
+        kills.setIcon("/icons/total_data/deaths.png");
         kills.setShinchan(String.valueOf(totalKills.stream()
             .filter(kill -> constants.PLAYER_SHINCHAN.equals(kill.getVictimName()))
             .count()));
@@ -877,7 +877,7 @@ public class TotalDataService {
         killsMap.put("Muertes", kills);
 
         kills = new TotalDataDTO();
-        kills.setIcon("./icons/total_data/headshots.png");    
+        kills.setIcon("/icons/total_data/headshots.png");    
         kills.setShinchan(String.valueOf(totalKills.stream()
             .filter(kill -> constants.PLAYER_SHINCHAN.equals(kill.getKillerName()) && kill.isHeadshot())
             .count()));
@@ -896,64 +896,64 @@ public class TotalDataService {
         killsMap.put("Headshots", kills);
 
         kills = new TotalDataDTO();
-        kills.setIcon("./icons/total_data/headshot_rate.png");
+        kills.setIcon("/icons/total_data/headshot_rate.png");
         kills.setShinchan(String.format("%.2f", 
             (Double.valueOf(killsMap.get("Headshots").getShinchan()) / Double.valueOf(killsMap.get("Eliminaciones").getShinchan())) * 100
-        ));
+        )+"%");
         kills.setKazama(String.format("%.2f",
             (Double.valueOf(killsMap.get("Headshots").getKazama()) / Double.valueOf(killsMap.get("Eliminaciones").getKazama())) * 100
-        ));
+        )+"%");
         kills.setMafios(String.format("%.2f",
             (Double.valueOf(killsMap.get("Headshots").getMafios()) / Double.valueOf(killsMap.get("Eliminaciones").getMafios())) * 100
-        ));
+        )+"%");
         kills.setNene(String.format("%.2f",
             (Double.valueOf(killsMap.get("Headshots").getNene()) / Double.valueOf(killsMap.get("Eliminaciones").getNene())) * 100
-        ));
+        )+"%");
         kills.setSwagchan(String.format("%.2f",
             (Double.valueOf(killsMap.get("Headshots").getSwagchan()) / Double.valueOf(killsMap.get("Eliminaciones").getSwagchan())) * 100
-        ));
+        )+"%");
         killsMap.put("% Headshots", kills);
 
         kills = new TotalDataDTO();
-        kills.setIcon("./icons/total_data/kd_ratio.png");
+        kills.setIcon("/icons/total_data/kd_ratio.png");
         kills.setShinchan(String.format("%.2f", 
-            (Double.valueOf(killsMap.get("Eliminaciones").getShinchan()) / Double.valueOf(killsMap.get("Muertes").getShinchan())) * 100
+            (Double.valueOf(killsMap.get("Eliminaciones").getShinchan()) / Double.valueOf(killsMap.get("Muertes").getShinchan()))
         ));
         kills.setKazama(String.format("%.2f",
-            (Double.valueOf(killsMap.get("Eliminaciones").getKazama()) / Double.valueOf(killsMap.get("Muertes").getKazama())) * 100
+            (Double.valueOf(killsMap.get("Eliminaciones").getKazama()) / Double.valueOf(killsMap.get("Muertes").getKazama()))
         ));
         kills.setMafios(String.format("%.2f",
-            (Double.valueOf(killsMap.get("Eliminaciones").getMafios()) / Double.valueOf(killsMap.get("Muertes").getMafios())) * 100
+            (Double.valueOf(killsMap.get("Eliminaciones").getMafios()) / Double.valueOf(killsMap.get("Muertes").getMafios()))
         ));
         kills.setNene(String.format("%.2f",
-            (Double.valueOf(killsMap.get("Eliminaciones").getNene()) / Double.valueOf(killsMap.get("Muertes").getNene())) * 100
+            (Double.valueOf(killsMap.get("Eliminaciones").getNene()) / Double.valueOf(killsMap.get("Muertes").getNene()))
         ));
         kills.setSwagchan(String.format("%.2f",
-            (Double.valueOf(killsMap.get("Eliminaciones").getSwagchan()) / Double.valueOf(killsMap.get("Muertes").getSwagchan())) * 100
+            (Double.valueOf(killsMap.get("Eliminaciones").getSwagchan()) / Double.valueOf(killsMap.get("Muertes").getSwagchan()))
         ));
         killsMap.put("K/D Ratio", kills);
 
         kills = new TotalDataDTO();
-        kills.setIcon("./icons/total_data/kda_ratio.png");
+        kills.setIcon("/icons/total_data/kda_ratio.png");
         kills.setShinchan(String.format("%.2f", 
-            (Double.valueOf((killsMap.get("Eliminaciones").getShinchan() + killsMap.get("Asistencias").getShinchan())) / Double.valueOf(killsMap.get("Muertes").getShinchan())) * 100
-        ));
+            (Double.valueOf(killsMap.get("Eliminaciones").getShinchan()) + Double.valueOf(killsMap.get("Asistencias").getShinchan())) / Double.valueOf(killsMap.get("Muertes").getShinchan()))
+        );
         kills.setKazama(String.format("%.2f",
-            (Double.valueOf((killsMap.get("Eliminaciones").getKazama() + killsMap.get("Asistencias").getKazama())) / Double.valueOf(killsMap.get("Muertes").getKazama())) * 100
-        ));
+            (Double.valueOf(killsMap.get("Eliminaciones").getKazama()) + Double.valueOf(killsMap.get("Asistencias").getKazama())) / Double.valueOf(killsMap.get("Muertes").getKazama()))
+        );
         kills.setMafios(String.format("%.2f",
-            (Double.valueOf((killsMap.get("Eliminaciones").getMafios() + killsMap.get("Asistencias").getMafios())) / Double.valueOf(killsMap.get("Muertes").getMafios())) * 100
-        ));
+            (Double.valueOf(killsMap.get("Eliminaciones").getMafios()) + Double.valueOf(killsMap.get("Asistencias").getMafios())) / Double.valueOf(killsMap.get("Muertes").getMafios()))
+        );
         kills.setNene(String.format("%.2f",
-            (Double.valueOf((killsMap.get("Eliminaciones").getNene() + killsMap.get("Asistencias").getNene())) / Double.valueOf(killsMap.get("Muertes").getNene())) * 100
-        ));
+            (Double.valueOf(killsMap.get("Eliminaciones").getNene()) + Double.valueOf(killsMap.get("Asistencias").getNene())) / Double.valueOf(killsMap.get("Muertes").getNene()))
+        );
         kills.setSwagchan(String.format("%.2f",
-            (Double.valueOf((killsMap.get("Eliminaciones").getSwagchan() + killsMap.get("Asistencias").getSwagchan())) / Double.valueOf(killsMap.get("Muertes").getSwagchan())) * 100
-        ));
+            (Double.valueOf(killsMap.get("Eliminaciones").getSwagchan()) + Double.valueOf(killsMap.get("Asistencias").getSwagchan())) / Double.valueOf(killsMap.get("Muertes").getSwagchan()))
+        );
         killsMap.put("K/D/A Ratio", kills);
 
         kills = new TotalDataDTO();
-        kills.setIcon("./icons/total_data/team_kills.png");
+        kills.setIcon("/icons/total_data/team_kills.png");
         kills.setShinchan(String.valueOf(totalKills.stream()
             .filter(kill -> constants.PLAYER_SHINCHAN.equals(kill.getKillerName()) && Arrays.asList(
                 constants.PLAYER_SWAGCHAN, 
@@ -992,7 +992,7 @@ public class TotalDataService {
         killsMap.put("Team kills", kills);
 
         kills = new TotalDataDTO();
-        kills.setIcon("./icons/total_data/flash_assists.png");
+        kills.setIcon("/icons/total_data/flash_assists.png");
         kills.setShinchan(String.valueOf(totalKills.stream()
             .filter(kill -> constants.PLAYER_SHINCHAN.equals(kill.getAssisterName()) && kill.isAssistedFlash() &&
             Arrays.asList(
@@ -1036,7 +1036,7 @@ public class TotalDataService {
         killsMap.put("Asistencias de flash", kills);
 
         kills = new TotalDataDTO();
-        kills.setIcon("./icons/total_data/blinded_kills.png");
+        kills.setIcon("/icons/total_data/blinded_kills.png");
         kills.setShinchan(String.valueOf(totalKills.stream()
             .filter(kill -> constants.PLAYER_SHINCHAN.equals(kill.getKillerName()) && kill.isKillerBlinded())
             .count()));
@@ -1055,7 +1055,7 @@ public class TotalDataService {
         killsMap.put("Eliminaciones ciego", kills);
 
         kills = new TotalDataDTO();
-        kills.setIcon("./icons/total_data/c4_deaths.png");
+        kills.setIcon("/icons/total_data/c4_deaths.png");
         kills.setShinchan(String.valueOf(totalKills.stream()
             .filter(kill -> constants.PLAYER_SHINCHAN.equals(kill.getVictimName()) && "C4".equals(kill.getWeaponName()))
             .count()));
@@ -1074,7 +1074,7 @@ public class TotalDataService {
         killsMap.put("Muertes por C4", kills);
 
         kills = new TotalDataDTO();
-        kills.setIcon("./icons/total_data/ct_side_kills.png");
+        kills.setIcon("/icons/total_data/ct_side_kills.png");
         kills.setShinchan(String.valueOf(totalKills.stream()
             .filter(kill -> constants.PLAYER_SHINCHAN.equals(kill.getKillerName()) && !constants.PLAYER_SHINCHAN.equals(kill.getVictimName()) &&
             kill.getKillerSide() == 2)
@@ -1098,7 +1098,7 @@ public class TotalDataService {
         killsMap.put("Elim. como CT", kills);
 
         kills = new TotalDataDTO();
-        kills.setIcon("./icons/total_data/t_side_kills.png");
+        kills.setIcon("/icons/total_data/t_side_kills.png");
         kills.setShinchan(String.valueOf(totalKills.stream()
             .filter(kill -> constants.PLAYER_SHINCHAN.equals(kill.getKillerName()) && !constants.PLAYER_SHINCHAN.equals(kill.getVictimName()) &&
             kill.getKillerSide() == 3)
