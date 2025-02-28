@@ -40,6 +40,7 @@ public class WeaponDataService {
             .map(weaponEntry -> {
                 Map<String, Long> playerCounts = weaponEntry.getValue();
                 return WeaponsDTO.builder().weapon(weaponEntry.getKey())
+                .icon("/icons/weapons/weapon_"+weaponEntry.getKey()+".svg")
                 .shinchan(playerCounts.getOrDefault(constants.PLAYER_SHINCHAN, 0L))
                 .kazama(playerCounts.getOrDefault(constants.PLAYER_KAZAMA, 0L))
                 .nene(playerCounts.getOrDefault(constants.PLAYER_NENE, 0L))
@@ -67,3 +68,6 @@ public class WeaponDataService {
         return result;
     }
 }
+
+
+// /icons/total_data/flash_enemies.png
