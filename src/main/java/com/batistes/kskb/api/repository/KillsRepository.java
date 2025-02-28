@@ -1,5 +1,6 @@
 package com.batistes.kskb.api.repository;
 
+import com.batistes.kskb.api.dto.WeaponCounterDTO;
 import com.batistes.kskb.api.entity.Kills;
 
 import java.sql.Date;
@@ -26,9 +27,20 @@ public interface KillsRepository extends JpaRepository<Kills, Long> {
     @Query("SELECT k FROM Kills k WHERE k.killerName IN :players OR k.assisterName IN :players OR k.victimName IN :players")
     public List<Kills> findByKillerNameOrAssisterNameOrVictimName(@Param("players") List<String>players);
 
-    @Query("SELECT k FROM Kills k JOIN Matches m ON k.matchChecksum = m.checksum WHERE m.date BETWEEN :startDate AND :endDate AND (k.killerName IN :players OR k.assisterName IN :players OR k.victimName IN :players)")
+    @Query("SELECT k FROM Kills k JOIN Matches m ON k.matchChecksum = m.checksum WHERE " +
+        "m.date BETWEEN :startDate AND :endDate AND " +
+        "(k.killerName IN :players OR k.assisterName IN :players OR k.victimName IN :players)")
     public List<Kills> findByKillerNameOrAssisterNameOrVictimNameBetweenDates(@Param("players") List<String>players, Date startDate, Date endDate);
 
     public List<Kills> findByKillerNameAndKillerSide(String player, Integer side);
 
+    @Query("SELECT k FROM Kills k JOIN Matches m ON k.matchChecksum = m.checksum WHERE " +
+        "m.date BETWEEN :startDate AND :endDate AND k.killerName IN (:players) AND k.weaponName != 'World'")
+    public List<Kills> findByKillerNameBetweenDates(@Param("players") List<String>players, Date startDate, Date endDate);
+
+
+    @Query("SELECT new com.batistes.kskb.api.dto.WeaponCounterDTO(k.killerName, COUNT(DISTINCT k.weaponName)) FROM Kills k JOIN " +
+        "Matches m ON k.matchChecksum = m.checksum WHERE m.date BETWEEN :startDate AND :endDate AND " + 
+        "k.killerName IN (:players) and k.weaponName != 'World' GROUP BY k.killerName")
+    public List<WeaponCounterDTO> countDistinctWeaponKillsByPlayers(@Param("players") List<String>players, Date startDate, Date endDate);
 }

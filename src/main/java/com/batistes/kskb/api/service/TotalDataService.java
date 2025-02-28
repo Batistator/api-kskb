@@ -40,7 +40,7 @@ import com.batistes.kskb.api.repository.PlayerEconomiesRepository;
 import com.batistes.kskb.api.repository.PlayersRepository;
 import com.batistes.kskb.api.repository.ShotsRepository;
 import com.batistes.kskb.api.util.Constants;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.batistes.kskb.api.util.Utils;
 
 @Service
 public class TotalDataService {
@@ -180,15 +180,9 @@ public class TotalDataService {
         totalDataList.sort((dto1, dto2) -> Integer.compare(dto1.getCustomOrder(), dto2.getCustomOrder()));
 
         //Convertimos el LIST en un STRING JSON
-        String jsonResult = "";
-        try {
-            jsonResult = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(totalDataList);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return "Error de conversión JSON";
-        }
+        String result = Utils.convertToJSON(totalDataList);
 
-        return jsonResult;
+        return result;
     }
 
     private Map<String, TotalDataDTO> filterBlinds (List<PlayerBlinds> totalBlinds){
