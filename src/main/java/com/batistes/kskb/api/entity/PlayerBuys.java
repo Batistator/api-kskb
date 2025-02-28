@@ -25,23 +25,23 @@ public class PlayerBuys {
     private Integer frame;
 
     @Column(nullable = false)
-    private String flasherSteamId;
+    private String playerSteamId;
 
     @Column(nullable = false)
-    private String flasherName;
+    private String playerName;
 
     @Column(nullable = false)
-    private Integer flasherSide;
+    private Integer playerSide;
 
     @Column(nullable = false)
-    private String flashedSteamId;
+    private String weaponName;
 
     @Column(nullable = false)
-    private String flashedName;
+    private String weaponType;
 
     @Column(nullable = false)
-    private String flashedSide;
+    private String weaponUniqueId;
 
     @Column(nullable = false)
-    private boolean isFlashedControllingBot;
+    private boolean hasRefunded;
 }
