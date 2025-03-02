@@ -42,46 +42,46 @@ public class Rounds {
     @Column(nullable = false)
     private Integer endOfficiallyFrame;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "team_a_name")
     private String teamAName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "team_b_name")
     private String teamBName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "team_a_score")
     private Integer teamAScore;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "team_b_score")
     private Integer teamBScore;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "team_a_side")
     private Integer teamASide;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "team_b_side")
     private Integer teamBSide;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "team_a_start_money")
     private Integer teamAStartMoney;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "team_b_start_money")
     private Integer teamBStartMoney;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "team_a_equipment_value")
     private Integer teamAEquipmentValue;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "team_b_equipment_value")
     private Integer teamBEquipmentValue;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "team_a_money_spent")
     private Integer teamAMoneySpent;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "team_b_money_spent")
     private Integer teamBMoneySpent;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "team_a_economy_type")
     private String teamAEconomyType;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "team_b_economy_type")
     private String teamBEconomyType;
 
     @Column(nullable = false)
