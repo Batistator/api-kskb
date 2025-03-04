@@ -44,22 +44,22 @@ public class AuthService {
     public Map<String, Object> registerUser(String username, String email, String password) {
         Map<String, Object> response = new HashMap<>();
         if (username == null || username.isEmpty() || email == null || email.isEmpty() || password == null || password.isEmpty()) {
-            response.put("Error", "All fields are required!");
+            response.put("error", "Todos los campos requeridos");
             return response;
         }
         
         if (userRepository.existsByUsername(username)) {
-            response.put("Error", "Username already in use!");
+            response.put("error", "Usuario ya en uso");
             return response;
         }
 
         if (userRepository.existsByEmail(email)) {
-            response.put("Error", "Email already in use!");
+            response.put("error", "Email ya en uso");
             return response;
         }
 
         if (!username.equals("Nene") && !username.equals("ShinChan") && !username.equals("The Mafios") && !username.equals("Kazama") && !username.equals("Swagchan")) {
-            response.put("Error", "User no recognized!");
+            response.put("error", "Usuario no reconocido");
             return response;
         }
 
