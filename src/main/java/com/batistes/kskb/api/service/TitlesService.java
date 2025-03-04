@@ -14,9 +14,12 @@ import org.springframework.stereotype.Service;
 
 import com.batistes.kskb.api.controller.AuthController;
 import com.batistes.kskb.api.dto.FullTitleDTO;
+import com.batistes.kskb.api.entity.BombsDefuseStart;
 import com.batistes.kskb.api.entity.BombsDefused;
+import com.batistes.kskb.api.entity.BombsPlantStart;
 import com.batistes.kskb.api.entity.BombsPlanted;
 import com.batistes.kskb.api.entity.ChickenDeaths;
+import com.batistes.kskb.api.entity.Clutches;
 import com.batistes.kskb.api.entity.Damages;
 import com.batistes.kskb.api.entity.GrenadeBounces;
 import com.batistes.kskb.api.entity.GrenadeProjectilesDestroy;
@@ -27,9 +30,12 @@ import com.batistes.kskb.api.entity.PlayerEconomies;
 import com.batistes.kskb.api.entity.Players;
 import com.batistes.kskb.api.entity.Rounds;
 import com.batistes.kskb.api.entity.Shots;
+import com.batistes.kskb.api.repository.BombsDefuseStartRepository;
 import com.batistes.kskb.api.repository.BombsDefusedRepository;
+import com.batistes.kskb.api.repository.BombsPlantStartRepository;
 import com.batistes.kskb.api.repository.BombsPlantedRepository;
 import com.batistes.kskb.api.repository.ChickenDeathsRepository;
+import com.batistes.kskb.api.repository.ClutchesRepository;
 import com.batistes.kskb.api.repository.DamagesRepository;
 import com.batistes.kskb.api.repository.GrenadeBouncesRepository;
 import com.batistes.kskb.api.repository.GrenadeProjectilesDestroyRepository;
@@ -41,6 +47,7 @@ import com.batistes.kskb.api.repository.PlayersRepository;
 import com.batistes.kskb.api.repository.RoundsRepository;
 import com.batistes.kskb.api.repository.ShotsRepository;
 import com.batistes.kskb.api.util.Constants;
+import com.batistes.kskb.api.util.Utils;
 
 @Service
 public class TitlesService {
@@ -52,6 +59,12 @@ public class TitlesService {
 
     @Autowired
     private BombsPlantedRepository bombsPlantedRepository;
+
+    @Autowired
+    private BombsDefuseStartRepository bombsDefuseStartRepository;
+
+    @Autowired
+    private BombsPlantStartRepository bombsPlantStartRepository;
 
     @Autowired
     private KillsRepository killsRepository;
@@ -72,6 +85,9 @@ public class TitlesService {
     private PlayerBlindsRepository playerBlindsRepository;
 
     @Autowired
+    private ClutchesRepository clutchesRepository;
+
+    @Autowired
     private DamagesRepository damagesRepository;
 
     @Autowired
@@ -86,9 +102,14 @@ public class TitlesService {
     @Autowired
     private Constants constants;
 
+    @Autowired
+    private Utils utils;
+
+    final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     public List<FullTitleDTO> findKillsTitle(Date startDate, Date endDate){
 
-        final Logger logger = LoggerFactory.getLogger(AuthController.class);
+        
         
         logger.info("Data retrieve start");
         List<Players> players = playersRepository.findByNameInBetweenDates(
@@ -107,6 +128,16 @@ public class TitlesService {
         
         logger.info("Bombs defused data Finished");     
         List<BombsPlanted> bombsPlanted = bombsPlantedRepository.findByPlanterNameInBetweenDates(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            startDate, endDate);
+        
+        logger.info("Bombs planted start data Finished");
+        List<BombsDefuseStart> bombsDefuseStart = bombsDefuseStartRepository.findByDefuserNameInBetweenDates(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            startDate, endDate);
+        
+        logger.info("Bombs defused start data Finished");     
+        List<BombsPlantStart> bombsPlantStart = bombsPlantStartRepository.findByPlanterNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
         
@@ -136,6 +167,11 @@ public class TitlesService {
             startDate, endDate);
         
         logger.info("Player blinds data Finished");
+        List<PlayerBuys> playerBuys = playerBuysRepository.findByPlayerNameInBetweenDates(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            startDate, endDate);
+        
+        logger.info("Player buys data Finished");
         List<Damages> damages = damagesRepository.findByAttackerSteamIdOrVictimSteamIdInBetweenDates(
             Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID),
             startDate, endDate);
@@ -146,9 +182,9 @@ public class TitlesService {
             startDate, endDate);
         logger.info("Grenade bounces data Finished");
 
-        List<PlayerBuys> grenadeBuys = playerBuysRepository.findByPlayerNameInBetweenDates(
+        List<Clutches> clutches = clutchesRepository.findByClutcherNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
-            startDate, endDate);
+           startDate, endDate);
         logger.info("Player buys data Finished");
 
         List<Rounds> rounds = roundsRepository.findAll();
@@ -161,6 +197,19 @@ public class TitlesService {
         titlesList.addAll(filterKills(kills, rounds));
         titlesList.addAll(filterPlayers(players));
         titlesList.addAll(filterGrenades(grenades));
+        titlesList.addAll(filterPrecision(shots, damages));
+        titlesList.addAll(filterClutches(clutches));
+        titlesList.addAll(filterBlinds(playerBlinds));
+        titlesList.addAll(filterPlants(bombsPlanted));
+        titlesList.addAll(filterDefuses(bombsDefused));
+        titlesList.addAll(filterFakePlants(bombsPlanted,bombsPlantStart));
+        titlesList.addAll(filterFakeDefuse(bombsDefused,bombsDefuseStart));
+        titlesList.addAll(filterChicken(chickenDeaths));
+        titlesList.addAll(filterPlayerBuys(playerBuys));
+        titlesList.addAll(filterPlayerEconomies(playerEconomies));
+        titlesList.addAll(filterShots(shots));
+        titlesList.addAll(filterDesperdicios(playerBuys,grenades));
+        titlesList.addAll(filterBounces(grenadeBounces));
 
         return titlesList;
     }
@@ -428,6 +477,164 @@ public class TitlesService {
                 .build())
             .orElse(null));
 
+        //  Título de la eliminación desde más lejos
+        titlesList.add(kills.stream()
+            .filter(kill -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+                .contains(kill.getKillerName()))
+            .max((kill1, kill2) -> Double.compare(kill1.getDistance(), kill2.getDistance()))
+            .map(kill -> 
+            FullTitleDTO.builder()
+                .title("El ojo de halcón")
+                .description("Eliminación a más distancia")
+                .player(kill.getKillerName())
+                .valueString(String.format("%.2f", kill.getDistance()) + " metros")
+                .build())
+            .orElse(null));
+
+        //  Título de más trade kills
+        titlesList.add(kills.stream()
+            .filter(kill -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+                .contains(kill.getKillerName()))
+            .filter(kill -> kill.isTradeKill())
+            .collect(Collectors.groupingBy(Kills::getKillerName, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> 
+            FullTitleDTO.builder()
+                .title("El lobo de WallStreet")
+                .description("Más trade kills")
+                .player(entry.getKey())
+                .valueString(entry.getValue().toString() + " Eliminaciones")
+                .build())
+            .orElse(null));
+
+        //  Título de más trade deaths
+        titlesList.add(kills.stream()
+            .filter(kill -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+                .contains(kill.getVictimName()))
+            .filter(kill -> kill.isTradeDeath())
+            .collect(Collectors.groupingBy(Kills::getVictimName, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> 
+            FullTitleDTO.builder()
+                .title("El cebo")
+                .description("Más trade deaths")
+                .player(entry.getKey())
+                .valueString(entry.getValue().toString() + " Muertes")
+                .build())
+            .orElse(null));
+
+        //  Título de más eliminaciones saltando
+        titlesList.add(kills.stream()
+            .filter(kill -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+                .contains(kill.getKillerName()))
+            .filter(kill -> kill.isKillerAirborne())
+            .collect(Collectors.groupingBy(Kills::getKillerName, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> 
+            FullTitleDTO.builder()
+                .title("El Legolas")
+                .description("Más kills saltando")
+                .player(entry.getKey())
+                .valueString(entry.getValue().toString() + " Eliminaciones")
+                .build())
+            .orElse(null));
+
+        //  Título de más eliminaciones atravesando
+        titlesList.add(kills.stream()
+            .filter(kill -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+                .contains(kill.getKillerName()))
+            .filter(kill -> kill.getPenetratedObjects() > 0)
+            .collect(Collectors.groupingBy(Kills::getKillerName, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> 
+            FullTitleDTO.builder()
+                .title("El dildo")
+                .description("Más muertes penetrando")
+                .player(entry.getKey())
+                .valueString(entry.getValue().toString() + " Eliminaciones")
+                .build())
+            .orElse(null));
+
+        //  Título de más eliminaciones traspasando humo
+        titlesList.add(kills.stream()
+            .filter(kill -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+                .contains(kill.getKillerName()))
+            .filter(kill -> kill.isThroughSmoke())
+            .collect(Collectors.groupingBy(Kills::getKillerName, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> 
+            FullTitleDTO.builder()
+                .title("El Snoop Dogg")
+                .description("Más eliminaciones atravesando humo")
+                .player(entry.getKey())
+                .valueString(entry.getValue().toString() + " Eliminaciones")
+                .build())
+            .orElse(null));
+
+        //  Título de más eliminaciones no scope
+        titlesList.add(kills.stream()
+            .filter(kill -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+                .contains(kill.getKillerName()))
+            .filter(kill -> kill.isNoScope())
+            .collect(Collectors.groupingBy(Kills::getKillerName, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> 
+            FullTitleDTO.builder()
+                .title("Chin chin. Afflelou")
+                .description("Más eliminaciones no scope")
+                .player(entry.getKey())
+                .valueString(entry.getValue().toString() + " Eliminaciones")
+                .build())
+            .orElse(null));
+
+        //  Título de más asistencias con flash
+        titlesList.add(kills.stream()
+            .filter(kill -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+                .contains(kill.getAssisterName()))
+            .filter(kill -> kill.isAssistedFlash())
+            .collect(Collectors.groupingBy(Kills::getAssisterName, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> 
+            FullTitleDTO.builder()
+                .title("El farero")
+                .description("Más asistencias con flash")
+                .player(entry.getKey())
+                .valueString(entry.getValue().toString() + " Eliminaciones")
+                .build())
+            .orElse(null));
+
+        //  Título de más eliminaciones ciego
+        titlesList.add(kills.stream()
+            .filter(kill -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+                .contains(kill.getKillerName()))
+            .filter(kill -> kill.isKillerBlinded())
+            .collect(Collectors.groupingBy(Kills::getKillerName, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> 
+            FullTitleDTO.builder()
+                .title("Corto de vista")
+                .description("Más eliminaciones estando ciego")
+                .player(entry.getKey())
+                .valueString(entry.getValue().toString() + " Eliminaciones")
+                .build())
+            .orElse(null));
+
         return titlesList;
     }
 
@@ -537,6 +744,97 @@ public class TitlesService {
                 .build())
             .orElse(null));
 
+        //  Título de más daño diverso
+        titlesList.add(players.stream()
+            .filter(player -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+                .contains(player.getName()))
+            .collect(Collectors.groupingBy(Players::getName, Collectors.summingInt(Players::getUtilityDamage)))
+            .entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> 
+            FullTitleDTO.builder()
+                .title("Viva la diversidad ")
+                .description("Más daño diverso")
+                .player(entry.getKey())
+                .valueString(entry.getValue().toString() + " Daño")
+                .build())
+            .orElse(null));
+
+        // Título de más Anti-shinchan
+        titlesList.add(players.stream()
+            .filter(player -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+                .contains(player.getName()))
+            .collect(Collectors.groupingBy(Players::getMatchChecksum))
+            .values()
+            .stream()
+            .flatMap(list -> list.stream()
+                .sorted((p1, p2) -> Integer.compare(p2.getScore(), p1.getScore()))
+                .limit(1))
+            .filter(player -> !player.getName().equals(constants.PLAYER_SHINCHAN))
+            .collect(Collectors.groupingBy(Players::getName, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> 
+                FullTitleDTO.builder()
+                .title("El anti-ShinChan")
+                .description("Por encima de ShinChan")
+                .player(entry.getKey())
+                .valueString(entry.getValue().toString() + " veces")
+                .build())
+            .orElse(null));
+
+        //  Título de más entry kills
+        titlesList.add(players.stream()
+        .filter(player -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+            .contains(player.getName()))
+        .collect(Collectors.groupingBy(Players::getName, Collectors.summingInt(Players::getFirstKillCount)))
+        .entrySet()
+        .stream()
+        .max(Map.Entry.comparingByValue())
+        .map(entry -> 
+        FullTitleDTO.builder()
+            .title("El derriba-puertas")
+            .description("Más entry kills")
+            .player(entry.getKey())
+            .valueString(entry.getValue().toString() + " Eliminaciones")
+            .build())
+        .orElse(null));
+
+        return titlesList;
+    }
+
+    private List<FullTitleDTO> filterPrecision (List<Shots> shots, List<Damages> damages){
+
+        List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
+        
+        //  Título de mejor precisión
+        titlesList.add(damages.stream()
+        .filter(damage -> Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID)
+            .contains(damage.getAttackerSteamId()))
+        .filter(damage -> !Arrays.asList("HE Grenade", "Incendiary Grenade", "Molotov").contains(damage.getWeaponName()))
+        .collect(Collectors.groupingBy(Damages::getAttackerSteamId, Collectors.counting()))
+        .entrySet()
+        .stream()
+        .map(entry -> {
+            String playerId = entry.getKey();
+            long totalShots = shots.stream()
+                .filter(shot -> shot.getPlayerSteamId().equals(playerId))
+                .count();
+            double precision = (double) entry.getValue() / totalShots * 100;
+            return Map.entry(playerId, precision);
+        })
+        .max(Map.Entry.comparingByValue())
+        .map(entry -> 
+            FullTitleDTO.builder()
+                .title("Enhebrando la aguja")
+                .description("Mayor precisión")
+                .player(utils.convertSteamIdToName(entry.getKey()))
+                .valueString(String.format("%.2f", entry.getValue()) + " %")
+                .build())
+        .orElse(null));
+
         return titlesList;
     }
 
@@ -631,6 +929,347 @@ public class TitlesService {
                 .player(entry.getKey())
                 .valueString(entry.getValue().toString() + " Fuegos")
                 .build())
+            .orElse(null));
+
+        return titlesList;
+    }
+
+    private List<FullTitleDTO> filterClutches (List<Clutches> clutches){
+        List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
+
+        //  Título de más clutches ganados
+        titlesList.add(clutches.stream()
+        .filter(clutch -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+            .contains(clutch.getClutcherName()))
+        .filter(clutch -> clutch.isWon() && clutch.getOpponentCount() >= 2)
+        .collect(Collectors.groupingBy(Clutches::getClutcherName, Collectors.counting()))
+        .entrySet()
+        .stream()
+        .max(Map.Entry.comparingByValue())
+        .map(entry -> 
+        FullTitleDTO.builder()
+            .title("El John Wick")
+            .description("Más clutches ganados")
+            .player(entry.getKey())
+            .valueString(entry.getValue().toString() + " Clutches")
+            .build())
+        .orElse(null));
+
+        return titlesList;
+    }
+
+    private List<FullTitleDTO> filterBlinds (List<PlayerBlinds> playerBlinds){
+        List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
+
+        //  Título de la flash más duradera
+        titlesList.add(playerBlinds.stream()
+            .filter(playerBlind -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+                .contains(playerBlind.getFlasherName()))
+            .max((playerBlind1, playerBlind2) -> Double.compare(playerBlind1.getDuration(), playerBlind2.getDuration()))
+            .map(playerBlind -> 
+            FullTitleDTO.builder()
+                .title("Taiyoken")
+                .description("Flash más duradera")
+                .player(playerBlind.getFlasherName())
+                .valueString(String.format("%.2f", playerBlind.getDuration()) + " segundos")
+                .build())
+            .orElse(null));
+
+        return titlesList;
+    }
+
+    private List<FullTitleDTO> filterDefuses (List<BombsDefused> bombsDefuseds){
+        List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
+
+        //  Título de más defuses
+        titlesList.add(bombsDefuseds.stream()
+            .filter(defuse -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+                .contains(defuse.getDefuserName()))
+            .collect(Collectors.groupingBy(BombsDefused::getDefuserName, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> 
+            FullTitleDTO.builder()
+                .title("El ingeniero")
+                .description("Más veces defusa")
+                .player(entry.getKey())
+                .valueString(entry.getValue().toString() + " Defuses")
+                .build())
+            .orElse(null));
+
+        return titlesList;
+    }
+
+    private List<FullTitleDTO> filterPlants (List<BombsPlanted> bombsPlanteds){
+        List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
+
+        //  Título de más plants
+        titlesList.add(bombsPlanteds.stream()
+            .filter(plant -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+                .contains(plant.getPlanterName()))
+            .collect(Collectors.groupingBy(BombsPlanted::getPlanterName, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> 
+            FullTitleDTO.builder()
+                .title("El botánico")
+                .description("Más veces planta")
+                .player(entry.getKey())
+                .valueString(entry.getValue().toString() + " Bombas")
+                .build())
+            .orElse(null));
+
+        return titlesList;
+    }
+
+    private List<FullTitleDTO> filterFakePlants (List<BombsPlanted> bombsPlanteds, List<BombsPlantStart> bombsPlantStart){
+        List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
+
+        //  Título de más fakes al plantar
+        titlesList.add(bombsPlantStart.stream()
+            .filter(plantStart -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+            .contains(plantStart.getPlanterName()))
+            .collect(Collectors.groupingBy(BombsPlantStart::getPlanterName, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .map(entry -> {
+            String playerName = entry.getKey();
+            long fakePlants = bombsPlantStart.stream()
+                .filter(start -> start.getPlanterName().equals(playerName))
+                .filter(start -> bombsPlanteds.stream()
+                .noneMatch(plant -> plant.getPlanterName().equals(playerName) && plant.getMatchChecksum().equals(start.getMatchChecksum()) && plant.getRoundNumber() == start.getRoundNumber()))
+                .count();
+            return Map.entry(playerName, fakePlants);
+            })
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> 
+            FullTitleDTO.builder()
+            .title("La planta mentirosa")
+            .description("Más fakes al plantar")
+            .player(entry.getKey())
+            .valueString(entry.getValue().toString() + " Fakes")
+            .build())
+            .orElse(null));
+
+        return titlesList;
+    }
+
+    private List<FullTitleDTO> filterFakeDefuse (List<BombsDefused> bombsDefused, List<BombsDefuseStart> bombsDefusedStart){
+        List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
+
+        //  Título de más fakes al defusar
+        titlesList.add(bombsDefusedStart.stream()
+            .filter(defuseStart -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+            .contains(defuseStart.getDefuserName()))
+            .collect(Collectors.groupingBy(BombsDefuseStart::getDefuserName, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .map(entry -> {
+            String playerName = entry.getKey();
+            long fakeDefuse = bombsDefusedStart.stream()
+                .filter(start -> start.getDefuserName().equals(playerName))
+                .filter(start -> bombsDefused.stream()
+                .noneMatch(defuse -> defuse.getDefuserName().equals(playerName) && defuse.getMatchChecksum().equals(start.getMatchChecksum()) && defuse.getRoundNumber() == start.getRoundNumber()))
+                .count();
+            return Map.entry(playerName, fakeDefuse);
+            })
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> 
+            FullTitleDTO.builder()
+            .title("El ingeniero mentiroso")
+            .description("Más fakes al defusar")
+            .player(entry.getKey())
+            .valueString(entry.getValue().toString() + " Fakes")
+            .build())
+            .orElse(null));
+
+        return titlesList;
+    }
+
+    private List<FullTitleDTO> filterChicken (List<ChickenDeaths> chickenDeaths){
+        List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
+
+        //  Título de más pollos asesinados
+        titlesList.add(chickenDeaths.stream()
+            .filter(chicken -> Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID)
+                .contains(chicken.getKillerSteamId()))
+            .collect(Collectors.groupingBy(ChickenDeaths::getKillerSteamId, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> 
+            FullTitleDTO.builder()
+                .title("Coronel Sanders")
+                .description("Más pollos asesinados")
+                .player(utils.convertSteamIdToName(entry.getKey()))
+                .valueString(entry.getValue().toString() + " pollos")
+                .build())
+            .orElse(null));
+
+        return titlesList;
+    }
+
+    private List<FullTitleDTO> filterPlayerEconomies (List<PlayerEconomies> playerEconomies){
+
+        List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
+
+        //  Título de más dinero gastado
+        titlesList.add(playerEconomies.stream()
+            .filter(economy -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+                .contains(economy.getPlayerName()))
+            .collect(Collectors.groupingBy(PlayerEconomies::getPlayerName, Collectors.summingInt(PlayerEconomies::getMoneySpent)))
+            .entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> 
+            FullTitleDTO.builder()
+                .title("El millonetis")
+                .description("Más dinero gastado")
+                .player(entry.getKey())
+                .valueString(entry.getValue().toString() + " $")
+                .build())
+            .orElse(null));
+
+        //  Título de menos dinero gastado
+        titlesList.add(playerEconomies.stream()
+            .filter(economy -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+                .contains(economy.getPlayerName()))
+            .collect(Collectors.groupingBy(PlayerEconomies::getPlayerName, Collectors.summingInt(PlayerEconomies::getMoneySpent)))
+            .entrySet()
+            .stream()
+            .min(Map.Entry.comparingByValue())
+            .map(entry -> 
+            FullTitleDTO.builder()
+                .title("El puño cerrao")
+                .description("Menos dinero gastado")
+                .player(entry.getKey())
+                .valueString(entry.getValue().toString() + " $")
+                .build())
+            .orElse(null));
+            
+        return titlesList;
+    }
+
+    private List<FullTitleDTO> filterPlayerBuys (List<PlayerBuys> playerBuys){
+
+        List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
+
+        //  Título de más devoluciones de armas
+        titlesList.add(playerBuys.stream()
+            .filter(buy -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+                .contains(buy.getPlayerName()))
+            .filter(buy -> buy.isHasRefunded())
+            .collect(Collectors.groupingBy(PlayerBuys::getPlayerName, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> 
+            FullTitleDTO.builder()
+                .title("El cliente insatisfecho")
+                .description("Más devoluciones")
+                .player(entry.getKey())
+                .valueString(entry.getValue().toString() + " Devoluciones")
+                .build())
+            .orElse(null));
+            
+        return titlesList;
+    }
+
+    private List<FullTitleDTO> filterShots (List<Shots> shots){
+        
+        List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
+
+        //  Título de más tiros
+        titlesList.add(shots.stream()
+            .filter(shot -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+                .contains(shot.getPlayerName()))
+            .collect(Collectors.groupingBy(Shots::getPlayerName, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> 
+            FullTitleDTO.builder()
+                .title("El derrochador de balas")
+                .description("Más disparos en total")
+                .player(entry.getKey())
+                .valueString(entry.getValue().toString() + " Disparos")
+                .build())
+            .orElse(null));
+
+        //  Título de menos tiros
+        titlesList.add(shots.stream()
+            .filter(shot -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+                .contains(shot.getPlayerName()))
+            .collect(Collectors.groupingBy(Shots::getPlayerName, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .min(Map.Entry.comparingByValue())
+            .map(entry -> 
+            FullTitleDTO.builder()
+                .title("El mosquetero")
+                .description("Menos disparos en total")
+                .player(entry.getKey())
+                .valueString(entry.getValue().toString() + " Disparos")
+                .build())
+            .orElse(null));
+            
+        return titlesList;
+    }
+
+    private List<FullTitleDTO> filterBounces (List<GrenadeBounces> bounces){
+        
+        List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
+
+        //  Título de más rebotes de granadas
+        titlesList.add(bounces.stream()
+            .filter(bounce -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+                .contains(bounce.getThrowerName()))
+            .collect(Collectors.groupingBy(GrenadeBounces::getThrowerName, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> 
+            FullTitleDTO.builder()
+                .title("El pinball")
+                .description("Más rebotes con granadas")
+                .player(entry.getKey())
+                .valueString(entry.getValue().toString() + " Rebotes")
+                .build())
+            .orElse(null));
+            
+        return titlesList;
+    }
+
+    private List<FullTitleDTO> filterDesperdicios (List<PlayerBuys> playerBuys, List<GrenadeProjectilesDestroy> grenades){
+        
+        List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
+
+        //  Título de más granadas desperdiciadas
+        titlesList.add(playerBuys.stream()
+            .filter(buy -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+            .contains(buy.getPlayerName()))
+            .filter(buy -> !buy.isHasRefunded())
+            .collect(Collectors.groupingBy(PlayerBuys::getPlayerName, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .map(entry -> {
+            String playerName = entry.getKey();
+            long grenadesThrown = grenades.stream()
+            .filter(grenade -> grenade.getThrowerName().equals(playerName))
+            .count();
+            long grenadesWasted = entry.getValue() - grenadesThrown;
+            return Map.entry(playerName, grenadesWasted);
+            })
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> 
+            FullTitleDTO.builder()
+            .title("Poco ecológico")
+            .description("Más granadas no usadas")
+            .player(entry.getKey())
+            .valueString(entry.getValue().toString() + " Granadas")
+            .build())
             .orElse(null));
 
         return titlesList;

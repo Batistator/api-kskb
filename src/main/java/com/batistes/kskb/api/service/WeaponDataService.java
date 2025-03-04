@@ -68,6 +68,3 @@ public class WeaponDataService {
         return result;
     }
 }
-
-
-// /icons/total_data/flash_enemies.png

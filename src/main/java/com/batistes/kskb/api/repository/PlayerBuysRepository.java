@@ -12,7 +12,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PlayerBuysRepository extends JpaRepository<PlayerBuys, Long> {
     
-    @Query("SELECT pb FROM PlayerBuys pb JOIN Matches m ON pb.matchChecksum = m.checksum WHERE m.date BETWEEN :startDate AND :endDate AND pb.playerName IN (:players) AND weaponType = 'grenade' AND hasRefunded = false")
+
+    @Query("SELECT pb FROM PlayerBuys pb JOIN Matches m ON pb.matchChecksum = m.checksum WHERE m.date BETWEEN :startDate AND :endDate AND pb.playerName IN (:players) AND weaponType = 'grenade'")
     List<PlayerBuys> findByPlayerNameInBetweenDates(List<String> players, Date startDate, Date endDate);
 
 }
