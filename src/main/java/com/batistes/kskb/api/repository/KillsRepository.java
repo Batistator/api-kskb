@@ -1,6 +1,6 @@
 package com.batistes.kskb.api.repository;
 
-import com.batistes.kskb.api.dto.TitleDTO;
+import com.batistes.kskb.api.config.TitleConfig;
 import com.batistes.kskb.api.dto.WeaponCounterDTO;
 import com.batistes.kskb.api.entity.Kills;
 
@@ -48,5 +48,5 @@ public interface KillsRepository extends JpaRepository<Kills, Long> {
     // Querys de títulos
 
     @Query(value = "SELECT killer_name as player, count(*) as value from kills k join matches m on k.match_checksum = m.checksum where m.\"date\" >= :startDate and m.\"date\" < :endDate and killer_name in (:players) and weapon_name != 'World' group by killer_name limit 1", nativeQuery=true)
-    public TitleDTO findKillsTitle(@Param("players") List<String>players, Date startDate, Date endDate);
+    public TitleConfig findKillsTitle(@Param("players") List<String>players, Date startDate, Date endDate);
 }

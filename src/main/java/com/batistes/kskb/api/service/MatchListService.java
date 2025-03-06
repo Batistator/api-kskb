@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.batistes.kskb.api.controller.AuthController;
 import com.batistes.kskb.api.dto.MatchDataDTO;
 import com.batistes.kskb.api.repository.MatchesRepository;
 import com.batistes.kskb.api.util.Utils;
@@ -25,7 +24,7 @@ public class MatchListService {
     private MatchesRepository matchesRepository;
 
     public String getMatchListData(Date startDate, Date endDate){
-        final Logger logger = LoggerFactory.getLogger(AuthController.class);
+        final Logger logger = LoggerFactory.getLogger(MatchListService.class);
         final List<MatchDataDTO> matchList = matchesRepository.getMatchList(Utils.convertUtilDateToSqlDate(startDate), Utils.convertUtilDateToSqlDate(endDate));
 
         calculateWeekDay(matchList);

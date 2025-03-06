@@ -3,7 +3,6 @@ package com.batistes.kskb.api.dto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.batistes.kskb.api.controller.AuthController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.Builder;
@@ -12,7 +11,7 @@ import lombok.Data;
 @Data
 @Builder
 public class WeaponsDTO {
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+    private static final Logger logger = LoggerFactory.getLogger(WeaponsDTO.class);
     
     private Integer customOrder;
     

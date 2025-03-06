@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import com.batistes.kskb.api.controller.AuthController;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +19,7 @@ import java.util.Map;
 @ControllerAdvice // Indica que esta clase manejará excepciones globalmente en los controladores
 public class GlobalExceptionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(NoResourceFoundException.class) // Maneja NoResourceFoundException
     public ResponseEntity<?> NoResourceFoundException(NoResourceFoundException exception, WebRequest request) {

@@ -5,7 +5,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.batistes.kskb.api.controller.AuthController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.Data;
@@ -13,7 +12,7 @@ import lombok.Data;
 @Data
 public class DashboardDTO {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+    private static final Logger logger = LoggerFactory.getLogger(DashboardDTO.class);
 
     private Integer wins;
     private Integer losses;

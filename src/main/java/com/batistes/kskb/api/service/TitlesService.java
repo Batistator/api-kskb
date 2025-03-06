@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.batistes.kskb.api.controller.AuthController;
+import com.batistes.kskb.api.config.TitleConfig;
 import com.batistes.kskb.api.dto.FullTitleDTO;
 import com.batistes.kskb.api.entity.BombsDefuseStart;
 import com.batistes.kskb.api.entity.BombsDefused;
@@ -105,11 +105,12 @@ public class TitlesService {
     @Autowired
     private Utils utils;
 
-    final Logger logger = LoggerFactory.getLogger(AuthController.class);
+    @Autowired
+    private TitleConfig titles;
 
-    public List<FullTitleDTO> findKillsTitle(Date startDate, Date endDate){
+    final Logger logger = LoggerFactory.getLogger(TitlesService.class);
 
-        
+    public List<FullTitleDTO> findAllTitles(Date startDate, Date endDate){
         
         logger.info("Data retrieve start");
         List<Players> players = playersRepository.findByNameInBetweenDates(
@@ -214,11 +215,22 @@ public class TitlesService {
         return titlesList;
     }
 
+    private FullTitleDTO buildTitle(String titleCode, String player, Object value){
+        return FullTitleDTO.builder()
+            .title(titles.getTitlesMap().get(titleCode).getTitle())
+            .description(titles.getTitlesMap().get(titleCode).getDescription())
+            .player(player)
+            .icon(titles.getTitlesMap().get(titleCode).getIcon())
+            .valueString(value.equals("-")?"-":
+                (value.toString() + " " + titles.getTitlesMap().get(titleCode).getUnit()))
+            .build();
+    }
+
     private List<FullTitleDTO> filterKills (List<Kills> kills, List<Rounds> rounds){
 
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
 
-        //  Título de más eliminaciones
+        //  Título de más eliminaciones 
         titlesList.add(kills.stream()
             .filter(kill -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
                 .contains(kill.getKillerName()))
@@ -227,14 +239,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("La mula de carga")
-                .description("Más eliminaciones")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Eliminaciones")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostkills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostkills","-","-")));
 
         //  Título de más muertes
         titlesList.add(kills.stream()
@@ -244,14 +250,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-                FullTitleDTO.builder()
-                .title("El mártir")
-                .description("Más muertes")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Muertes")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostdeaths",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostdeaths","-","-")));
 
         //  Título de más asistencias
         titlesList.add(kills.stream()
@@ -262,14 +262,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-                FullTitleDTO.builder()
-                .title("La enfermera")
-                .description("Más asistencias")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Asistencias")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostassists",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostassists","-","-")));
 
         //  Título de menos muertes
         titlesList.add(kills.stream()
@@ -279,14 +273,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .min(Map.Entry.comparingByValue())
-            .map(entry -> 
-                FullTitleDTO.builder()
-                .title("El último superviviente")
-                .description("Menos muertes")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Muertes")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("lessdeaths",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("lessdeaths","-","-")));
 
         //  Título de porcentaje de tiros en la cabeza
         titlesList.add(kills.stream()
@@ -302,14 +290,8 @@ public class TitlesService {
                 return Map.entry(entry.getKey(), headshotPercentage);
             })
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-                FullTitleDTO.builder()
-                .title("El neurocirujano")
-                .description("Mejor porcentaje de tiros a la cabeza")
-                .player(entry.getKey())
-                .valueString(String.format("%.2f", entry.getValue()) + " %")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostheadshots",entry.getKey(),String.format("%.2f", entry.getValue())))
+            .orElse(buildTitle("mostheadshots","-","-")));
 
         //  Título de eliminación más rápida
         titlesList.add(kills.stream()
@@ -321,14 +303,8 @@ public class TitlesService {
                 .filter(round -> round.getMatchChecksum().equals(kill.getMatchChecksum()) && round.getNumber() == kill.getRoundNumber())
                 .map(round -> Map.entry(kill.getKillerName(), (double) (kill.getTick() - round.getFreezeTimeEndTick()))))
             .min(Map.Entry.comparingByValue())
-            .map(entry -> 
-                FullTitleDTO.builder()
-                .title("El Lucky Luke")
-                .description("La eliminación más rápida")
-                .player(entry.getKey())
-                .valueString(String.format("%.2f", entry.getValue() / 64) + " segundos")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("fastestkill",entry.getKey(),String.format("%.2f", entry.getValue() / 64)))
+            .orElse(buildTitle("fastestkill","-","-")));
 
         //  Título de muerte más rápida
         titlesList.add(kills.stream()
@@ -340,32 +316,20 @@ public class TitlesService {
                 .filter(round -> round.getMatchChecksum().equals(kill.getMatchChecksum()) && round.getNumber() == kill.getRoundNumber())
                 .map(round -> Map.entry(kill.getVictimName(), (double) (kill.getTick() - round.getFreezeTimeEndTick()))))
             .min(Map.Entry.comparingByValue())
-            .map(entry -> 
-                FullTitleDTO.builder()
-                .title("El Lemming")
-                .description("La muerte más rápida")
-                .player(entry.getKey())
-                .valueString(String.format("%.2f", entry.getValue() / 64) + " segundos")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("fastestdeath",entry.getKey(),String.format("%.2f", entry.getValue() / 64)))
+            .orElse(buildTitle("fastestdeath","-","-")));
 
         //  Título de más muertes por C4
         titlesList.add(kills.stream()
-        .filter(kill -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
-            .contains(kill.getVictimName()))
-        .filter(kill -> kill.getWeaponName().equals("C4"))
-        .collect(Collectors.groupingBy(Kills::getVictimName, Collectors.counting()))
-        .entrySet()
-        .stream()
-        .max(Map.Entry.comparingByValue())
-        .map(entry -> 
-            FullTitleDTO.builder()
-            .title("El pasota")
-            .description("Más veces muerto por C4")
-            .player(entry.getKey())
-            .valueString(entry.getValue().toString() + " Muertes")
-            .build())
-        .orElse(null));
+            .filter(kill -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+                .contains(kill.getVictimName()))
+            .filter(kill -> kill.getWeaponName().equals("C4"))
+            .collect(Collectors.groupingBy(Kills::getVictimName, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> buildTitle("mostc4deaths",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostc4deaths","-","-")));
 
         //  Título de más team kills
         titlesList.add(kills.stream()
@@ -378,14 +342,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("El traidor")
-                .description("Más team kills")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Eliminaciones")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostteamkills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostteamkills","-","-")));
 
         //  Título de más eliminaciones con granada
         titlesList.add(kills.stream()
@@ -396,14 +354,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("Personalidad Explosiva")
-                .description("Más eliminaciones con granada")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Eliminaciones")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mosthekills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mosthekills","-","-")));
 
         //  Título de más eliminaciones con fuego
         titlesList.add(kills.stream()
@@ -414,14 +366,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("Ola de calor")
-                .description("Más eliminaciones con fuego")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Eliminaciones")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostfirekills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostfirekills","-","-")));
 
         //  Título de más eliminaciones con cuchillo
         titlesList.add(kills.stream()
@@ -432,14 +378,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("El afilador")
-                .description("Más eliminaciones con cuchillo")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Eliminaciones")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostknifekills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostknifekills","-","-")));
 
         //  Título de más eliminaciones con taser
         titlesList.add(kills.stream()
@@ -450,14 +390,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("El Pikachu")
-                .description("Más eliminaciones con taser")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Eliminaciones")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mosttaserkills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mosttaserkills","-","-")));
 
         //  Título de más eliminaciones con escopeta
         titlesList.add(kills.stream()
@@ -468,28 +402,16 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("El fotógrafo")
-                .description("Más muertes con escopeta")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Eliminaciones")
-                .build())
-            .orElse(null));
-
+            .map(entry -> buildTitle("mostshotgunkills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostshotgunkills","-","-")));
+            
         //  Título de la eliminación desde más lejos
         titlesList.add(kills.stream()
             .filter(kill -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
                 .contains(kill.getKillerName()))
             .max((kill1, kill2) -> Double.compare(kill1.getDistance(), kill2.getDistance()))
-            .map(kill -> 
-            FullTitleDTO.builder()
-                .title("El ojo de halcón")
-                .description("Eliminación a más distancia")
-                .player(kill.getKillerName())
-                .valueString(String.format("%.2f", kill.getDistance()) + " metros")
-                .build())
-            .orElse(null));
+            .map(kill -> buildTitle("mostdistancekill",kill.getKillerName(),String.format("%.2f", kill.getDistance())))
+            .orElse(buildTitle("mostshotgunkills","-","-")));
 
         //  Título de más trade kills
         titlesList.add(kills.stream()
@@ -500,14 +422,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("El lobo de WallStreet")
-                .description("Más trade kills")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Eliminaciones")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mosttradekills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mosttradekills","-","-")));
 
         //  Título de más trade deaths
         titlesList.add(kills.stream()
@@ -518,15 +434,9 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("El cebo")
-                .description("Más trade deaths")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Muertes")
-                .build())
-            .orElse(null));
-
+            .map(entry -> buildTitle("mosttradedeaths",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mosttradedeaths","-","-")));
+            
         //  Título de más eliminaciones saltando
         titlesList.add(kills.stream()
             .filter(kill -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
@@ -536,14 +446,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("El Legolas")
-                .description("Más kills saltando")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Eliminaciones")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostairkills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostairkills","-","-")));
 
         //  Título de más eliminaciones atravesando
         titlesList.add(kills.stream()
@@ -554,14 +458,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("El dildo")
-                .description("Más muertes penetrando")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Eliminaciones")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostthroughkills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostthroughkills","-","-")));
 
         //  Título de más eliminaciones traspasando humo
         titlesList.add(kills.stream()
@@ -572,14 +470,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("El Snoop Dogg")
-                .description("Más eliminaciones atravesando humo")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Eliminaciones")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostsmokekills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostsmokekills","-","-")));
 
         //  Título de más eliminaciones no scope
         titlesList.add(kills.stream()
@@ -590,14 +482,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("Chin chin. Afflelou")
-                .description("Más eliminaciones no scope")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Eliminaciones")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostnoscope",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostnoscope","-","-")));
 
         //  Título de más asistencias con flash
         titlesList.add(kills.stream()
@@ -608,14 +494,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("El farero")
-                .description("Más asistencias con flash")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Eliminaciones")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostflashassists",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostflashassists","-","-")));
 
         //  Título de más eliminaciones ciego
         titlesList.add(kills.stream()
@@ -626,14 +506,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("Corto de vista")
-                .description("Más eliminaciones estando ciego")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Eliminaciones")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostblindkills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostblindkills","-","-")));
 
         return titlesList;
     }
@@ -650,14 +524,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("Ace Ventura")
-                .description("Más veces 5K")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Rachas")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("most5k",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("most5k","-","-")));
 
         //  Título de más 4K
         titlesList.add(players.stream()
@@ -667,14 +535,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("Ultra HD")
-                .description("Más veces 4K")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Rachas")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("most4k",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("most4k","-","-")));
 
         //  Título de más 3K
         titlesList.add(players.stream()
@@ -684,15 +546,9 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("Mr. Triplete")
-                .description("Más veces 3K")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Rachas")
-                .build())
-            .orElse(null));
-
+            .map(entry -> buildTitle("most3k",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("most3k","-","-")));
+                    
         //  Título de más 2K
         titlesList.add(players.stream()
             .filter(player -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
@@ -701,15 +557,9 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("Efecto 2000")
-                .description("Más veces 2K")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Rachas")
-                .build())
-            .orElse(null));
-
+            .map(entry -> buildTitle("most2k",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("most2k","-","-")));
+            
         //  Título de más 1K
         titlesList.add(players.stream()
             .filter(player -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
@@ -718,14 +568,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("El humilde")
-                .description("Más veces 1K")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Rachas")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("most1k",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("most1k","-","-")));
 
         //  Título de más MVP
         titlesList.add(players.stream()
@@ -735,14 +579,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("El musiquitas")
-                .description("Más MVPs")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " MVPs")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostmvp",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostmvp","-","-")));
 
         //  Título de más daño diverso
         titlesList.add(players.stream()
@@ -752,14 +590,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("Viva la diversidad ")
-                .description("Más daño diverso")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Daño")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostdd",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostdd","-","-")));
 
         // Título de más Anti-shinchan
         titlesList.add(players.stream()
@@ -776,31 +608,19 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-                FullTitleDTO.builder()
-                .title("El anti-ShinChan")
-                .description("Por encima de ShinChan")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " veces")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostovershinchan",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostovershinchan","-","-")));
 
         //  Título de más entry kills
         titlesList.add(players.stream()
-        .filter(player -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
-            .contains(player.getName()))
-        .collect(Collectors.groupingBy(Players::getName, Collectors.summingInt(Players::getFirstKillCount)))
-        .entrySet()
-        .stream()
-        .max(Map.Entry.comparingByValue())
-        .map(entry -> 
-        FullTitleDTO.builder()
-            .title("El derriba-puertas")
-            .description("Más entry kills")
-            .player(entry.getKey())
-            .valueString(entry.getValue().toString() + " Eliminaciones")
-            .build())
-        .orElse(null));
+            .filter(player -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+                .contains(player.getName()))
+            .collect(Collectors.groupingBy(Players::getName, Collectors.summingInt(Players::getFirstKillCount)))
+            .entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> buildTitle("mostentrykills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostentrykills","-","-")));
 
         return titlesList;
     }
@@ -811,30 +631,23 @@ public class TitlesService {
         
         //  Título de mejor precisión
         titlesList.add(damages.stream()
-        .filter(damage -> Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID)
-            .contains(damage.getAttackerSteamId()))
-        .filter(damage -> !Arrays.asList("HE Grenade", "Incendiary Grenade", "Molotov").contains(damage.getWeaponName()))
-        .collect(Collectors.groupingBy(Damages::getAttackerSteamId, Collectors.counting()))
-        .entrySet()
-        .stream()
-        .map(entry -> {
-            String playerId = entry.getKey();
-            long totalShots = shots.stream()
-                .filter(shot -> shot.getPlayerSteamId().equals(playerId))
-                .count();
-            double precision = (double) entry.getValue() / totalShots * 100;
-            return Map.entry(playerId, precision);
-        })
-        .max(Map.Entry.comparingByValue())
-        .map(entry -> 
-            FullTitleDTO.builder()
-                .title("Enhebrando la aguja")
-                .description("Mayor precisión")
-                .player(utils.convertSteamIdToName(entry.getKey()))
-                .valueString(String.format("%.2f", entry.getValue()) + " %")
-                .build())
-        .orElse(null));
-
+            .filter(damage -> Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID)
+                .contains(damage.getAttackerSteamId()))
+            .filter(damage -> !Arrays.asList("HE Grenade", "Incendiary Grenade", "Molotov").contains(damage.getWeaponName()))
+            .collect(Collectors.groupingBy(Damages::getAttackerSteamId, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .map(entry -> {
+                String playerId = entry.getKey();
+                long totalShots = shots.stream()
+                    .filter(shot -> shot.getPlayerSteamId().equals(playerId))
+                    .count();
+                double precision = (double) entry.getValue() / totalShots * 100;
+                return Map.entry(playerId, precision);
+            })
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> buildTitle("mostprecision",utils.convertSteamIdToName(entry.getKey()),String.format("%.2f", entry.getValue())))
+            .orElse(buildTitle("mostprecision","-","-")));
         return titlesList;
     }
 
@@ -850,14 +663,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("El Granaino")
-                .description("Tira más granadas HE")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Granadas")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mosthe",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mosthe","-","-")));
 
         //  Título de más decoys tiradas
         titlesList.add(grenades.stream()
@@ -868,14 +675,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("El trilero")
-                .description("Tira más granadas decoy")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Decoys")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostdecoy",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostdecoy","-","-")));
 
         //  Título de más flashes tiradas
         titlesList.add(grenades.stream()
@@ -886,14 +687,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("Flashdance")
-                .description("Tira más granadas flash")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Flashes")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostflash",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostflash","-","-")));
 
         //  Título de más humos tirados
         titlesList.add(grenades.stream()
@@ -904,14 +699,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("SmokeHouse")
-                .description("Tira más granadas de humo")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Humos")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostsmoke",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostsmoke","-","-")));
 
         //  Título de más fuegos tirados
         titlesList.add(grenades.stream()
@@ -922,14 +711,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("Hot And Spicy")
-                .description("Tira más molotov o incend.")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Fuegos")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostfire",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostfire","-","-")));
 
         return titlesList;
     }
@@ -939,21 +722,15 @@ public class TitlesService {
 
         //  Título de más clutches ganados
         titlesList.add(clutches.stream()
-        .filter(clutch -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
-            .contains(clutch.getClutcherName()))
-        .filter(clutch -> clutch.isWon() && clutch.getOpponentCount() >= 2)
-        .collect(Collectors.groupingBy(Clutches::getClutcherName, Collectors.counting()))
-        .entrySet()
-        .stream()
-        .max(Map.Entry.comparingByValue())
-        .map(entry -> 
-        FullTitleDTO.builder()
-            .title("El John Wick")
-            .description("Más clutches ganados")
-            .player(entry.getKey())
-            .valueString(entry.getValue().toString() + " Clutches")
-            .build())
-        .orElse(null));
+            .filter(clutch -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
+                .contains(clutch.getClutcherName()))
+            .filter(clutch -> clutch.isWon() && clutch.getOpponentCount() >= 2)
+            .collect(Collectors.groupingBy(Clutches::getClutcherName, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> buildTitle("mostclutches",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostclutches","-","-")));
 
         return titlesList;
     }
@@ -966,14 +743,8 @@ public class TitlesService {
             .filter(playerBlind -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
                 .contains(playerBlind.getFlasherName()))
             .max((playerBlind1, playerBlind2) -> Double.compare(playerBlind1.getDuration(), playerBlind2.getDuration()))
-            .map(playerBlind -> 
-            FullTitleDTO.builder()
-                .title("Taiyoken")
-                .description("Flash más duradera")
-                .player(playerBlind.getFlasherName())
-                .valueString(String.format("%.2f", playerBlind.getDuration()) + " segundos")
-                .build())
-            .orElse(null));
+            .map(playerBlind -> buildTitle("longestflash",playerBlind.getFlasherName(),String.format("%.2f", playerBlind.getDuration())))
+            .orElse(buildTitle("longestflash","-","-")));
 
         return titlesList;
     }
@@ -989,14 +760,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("El ingeniero")
-                .description("Más veces defusa")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Defuses")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostdefuses",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostdefuses","-","-")));
 
         return titlesList;
     }
@@ -1012,14 +777,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("El botánico")
-                .description("Más veces planta")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Bombas")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostplants",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostplants","-","-")));
 
         return titlesList;
     }
@@ -1044,14 +803,8 @@ public class TitlesService {
             return Map.entry(playerName, fakePlants);
             })
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-            .title("La planta mentirosa")
-            .description("Más fakes al plantar")
-            .player(entry.getKey())
-            .valueString(entry.getValue().toString() + " Fakes")
-            .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostfakeplant",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostfakeplant","-","-")));
 
         return titlesList;
     }
@@ -1076,14 +829,8 @@ public class TitlesService {
             return Map.entry(playerName, fakeDefuse);
             })
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-            .title("El ingeniero mentiroso")
-            .description("Más fakes al defusar")
-            .player(entry.getKey())
-            .valueString(entry.getValue().toString() + " Fakes")
-            .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostfakedefuse",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostfakedefuse","-","-")));
 
         return titlesList;
     }
@@ -1099,14 +846,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("Coronel Sanders")
-                .description("Más pollos asesinados")
-                .player(utils.convertSteamIdToName(entry.getKey()))
-                .valueString(entry.getValue().toString() + " pollos")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostchicken",utils.convertSteamIdToName(entry.getKey()),entry.getValue()))
+            .orElse(buildTitle("mostchicken","-","-")));
 
         return titlesList;
     }
@@ -1123,14 +864,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("El millonetis")
-                .description("Más dinero gastado")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " $")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostspent",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostspent","-","-")));
 
         //  Título de menos dinero gastado
         titlesList.add(playerEconomies.stream()
@@ -1140,15 +875,9 @@ public class TitlesService {
             .entrySet()
             .stream()
             .min(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("El puño cerrao")
-                .description("Menos dinero gastado")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " $")
-                .build())
-            .orElse(null));
-            
+            .map(entry -> buildTitle("lessspent",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("lessspent","-","-")));
+
         return titlesList;
     }
 
@@ -1165,15 +894,9 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("El cliente insatisfecho")
-                .description("Más devoluciones")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Devoluciones")
-                .build())
-            .orElse(null));
-            
+            .map(entry -> buildTitle("mostrefunds",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostrefunds","-","-")));
+
         return titlesList;
     }
 
@@ -1189,14 +912,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("El derrochador de balas")
-                .description("Más disparos en total")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Disparos")
-                .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostshots",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostshots","-","-")));
 
         //  Título de menos tiros
         titlesList.add(shots.stream()
@@ -1206,15 +923,9 @@ public class TitlesService {
             .entrySet()
             .stream()
             .min(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("El mosquetero")
-                .description("Menos disparos en total")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Disparos")
-                .build())
-            .orElse(null));
-            
+            .map(entry -> buildTitle("lessshots",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("lessshots","-","-")));
+
         return titlesList;
     }
 
@@ -1230,15 +941,9 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-                .title("El pinball")
-                .description("Más rebotes con granadas")
-                .player(entry.getKey())
-                .valueString(entry.getValue().toString() + " Rebotes")
-                .build())
-            .orElse(null));
-            
+            .map(entry -> buildTitle("mostgrenadebounces",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostgrenadebounces","-","-")));
+
         return titlesList;
     }
 
@@ -1249,28 +954,22 @@ public class TitlesService {
         //  Título de más granadas desperdiciadas
         titlesList.add(playerBuys.stream()
             .filter(buy -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
-            .contains(buy.getPlayerName()))
+                .contains(buy.getPlayerName()))
             .filter(buy -> !buy.isHasRefunded())
             .collect(Collectors.groupingBy(PlayerBuys::getPlayerName, Collectors.counting()))
             .entrySet()
             .stream()
             .map(entry -> {
-            String playerName = entry.getKey();
-            long grenadesThrown = grenades.stream()
-            .filter(grenade -> grenade.getThrowerName().equals(playerName))
-            .count();
-            long grenadesWasted = entry.getValue() - grenadesThrown;
-            return Map.entry(playerName, grenadesWasted);
+                String playerName = entry.getKey();
+                long grenadesThrown = grenades.stream()
+                .filter(grenade -> grenade.getThrowerName().equals(playerName))
+                .count();
+                long grenadesWasted = entry.getValue() - grenadesThrown;
+                return Map.entry(playerName, grenadesWasted);
             })
             .max(Map.Entry.comparingByValue())
-            .map(entry -> 
-            FullTitleDTO.builder()
-            .title("Poco ecológico")
-            .description("Más granadas no usadas")
-            .player(entry.getKey())
-            .valueString(entry.getValue().toString() + " Granadas")
-            .build())
-            .orElse(null));
+            .map(entry -> buildTitle("mostunusedgrenades",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(buildTitle("mostunusedgrenades","-","-")));
 
         return titlesList;
     }

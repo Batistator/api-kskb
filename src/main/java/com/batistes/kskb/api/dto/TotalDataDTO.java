@@ -3,14 +3,13 @@ package com.batistes.kskb.api.dto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.batistes.kskb.api.controller.AuthController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 
 @Data
 public class TotalDataDTO {
     
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+    private static final Logger logger = LoggerFactory.getLogger(TotalDataDTO.class);
     
     private Integer customOrder;
     

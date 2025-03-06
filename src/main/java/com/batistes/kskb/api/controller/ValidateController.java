@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/validation")
 public class ValidateController {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ValidateController.class);
 
     @PostMapping("/token")
     @PreAuthorize("isAuthenticated()")

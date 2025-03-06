@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import com.batistes.kskb.api.repository.MatchesRepository;
 import com.batistes.kskb.api.util.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.batistes.kskb.api.controller.AuthController;
 import com.batistes.kskb.api.dto.DashboardDTO;
 import com.batistes.kskb.api.dto.MapResultsDTO;
 import com.batistes.kskb.api.dto.MatchDataDTO;
@@ -27,7 +26,7 @@ public class DashboardService {
     @Autowired
     private MatchesRepository matchesRepository;
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+    private static final Logger logger = LoggerFactory.getLogger(DashboardService.class);
 
     public String getDashboardData(Date startDate, Date endDate){
 

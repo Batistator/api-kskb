@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.batistes.kskb.api.controller.AuthController;
 import com.batistes.kskb.api.dto.TotalDataDTO;
 import com.batistes.kskb.api.entity.BombsDefused;
 import com.batistes.kskb.api.entity.BombsPlanted;
@@ -87,7 +86,7 @@ public class TotalDataService {
 
     public String getTotalData(Date startDate, Date endDate){
 
-        final Logger logger = LoggerFactory.getLogger(AuthController.class);
+        final Logger logger = LoggerFactory.getLogger(TotalDataService.class);
         
         logger.info("Data retrieve start");
         List<Players> players = playersRepository.findByNameInBetweenDates(

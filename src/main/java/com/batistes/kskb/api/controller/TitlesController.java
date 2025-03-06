@@ -18,7 +18,7 @@ public class TitlesController {
     @Autowired
     private TitlesService titlesService;
 
-    @GetMapping("/getKillsTitle")
+    @GetMapping(value = "/getAllTitles" , produces = "application/json;charset=UTF-8")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getWeaponData(
             @RequestParam("startDate") String startDateStr,
@@ -26,7 +26,7 @@ public class TitlesController {
         try {
             Date startDate = Date.valueOf(startDateStr);
             Date endDate = Date.valueOf(endDateStr);
-            return ResponseEntity.ok(titlesService.findKillsTitle(startDate, endDate));
+            return ResponseEntity.ok(titlesService.findAllTitles(startDate, endDate));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("Invalid date format. Please use yyyy-MM-dd.");
         }
