@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.batistes.kskb</groupId>
 	<artifactId>Kskb-backend</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.0</version>
 	<name>kskb-backend</name>
 	<description>Backend para alimentar a la web de la KSKB</description>
 	<url/>
