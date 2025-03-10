@@ -212,6 +212,25 @@ public class TitlesService {
         titlesList.addAll(filterDesperdicios(playerBuys,grenades));
         titlesList.addAll(filterBounces(grenadeBounces));
 
+        // Liberar referencias a las listas
+        logger.info("Liberando memoria");
+        players = null;
+        kills = null;
+        bombsDefused = null;
+        bombsPlanted = null;
+        bombsDefuseStart = null;
+        bombsPlantStart = null;
+        grenades = null;
+        playerEconomies = null;
+        shots = null;
+        chickenDeaths = null;
+        playerBlinds = null;
+        playerBuys = null;
+        damages = null;
+        grenadeBounces = null;
+        clutches = null;
+        rounds = null;
+
         return titlesList;
     }
 
