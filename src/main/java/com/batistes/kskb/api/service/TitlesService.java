@@ -14,22 +14,19 @@ import org.springframework.stereotype.Service;
 
 import com.batistes.kskb.api.config.TitleConfig;
 import com.batistes.kskb.api.dto.FullTitleDTO;
+import com.batistes.kskb.api.dto.StatisticDTO;
 import com.batistes.kskb.api.entity.BombsDefuseStart;
 import com.batistes.kskb.api.entity.BombsDefused;
 import com.batistes.kskb.api.entity.BombsPlantStart;
 import com.batistes.kskb.api.entity.BombsPlanted;
 import com.batistes.kskb.api.entity.ChickenDeaths;
 import com.batistes.kskb.api.entity.Clutches;
-import com.batistes.kskb.api.entity.Damages;
-import com.batistes.kskb.api.entity.GrenadeBounces;
 import com.batistes.kskb.api.entity.GrenadeProjectilesDestroy;
 import com.batistes.kskb.api.entity.Kills;
 import com.batistes.kskb.api.entity.PlayerBlinds;
-import com.batistes.kskb.api.entity.PlayerBuys;
 import com.batistes.kskb.api.entity.PlayerEconomies;
 import com.batistes.kskb.api.entity.Players;
 import com.batistes.kskb.api.entity.Rounds;
-import com.batistes.kskb.api.entity.Shots;
 import com.batistes.kskb.api.repository.BombsDefuseStartRepository;
 import com.batistes.kskb.api.repository.BombsDefusedRepository;
 import com.batistes.kskb.api.repository.BombsPlantStartRepository;
@@ -176,12 +173,33 @@ public class TitlesService {
         List<StatisticDTO> shotsData = shotsRepository.countShotsByPlayerNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
+        logger.info("Shots data Finished");
 
         List<StatisticDTO> damagesData = damagesRepository.countDamagesByAttackerSteamIdInBetweenDates(
             Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID),
             startDate, endDate);
-        logger.info("Shots data Finished");
+        logger.info("Damages data Finished");
 
+        List<StatisticDTO> playerRefundsData = playerBuysRepository.findRefundsByPlayerNameInBetweenDates(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            startDate, endDate);
+        logger.info("Player Refunds data Finished");
+
+        List<StatisticDTO> playerGrenadeBuysData = playerBuysRepository.findGrenadeBuysByPlayerNameInBetweenDates(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            startDate, endDate);
+        logger.info("Player Grenade Buys data Finished");
+
+        List<StatisticDTO> grenadeThrowsData = grenadeProjectilesDestroyRepository.countGrenadesByThrowerNameInBetweenDates(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            startDate, endDate);
+        logger.info("Player Grenade Throws data Finished");
+
+        List<StatisticDTO> grenadeBouncesData = grenadeBouncesRepository.countBouncesByPlayerNameInBetweenDates(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            startDate, endDate);
+        logger.info("Grenade Bounces data Finished");
+        
         logger.info("SQL Finished");
 
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
@@ -189,7 +207,7 @@ public class TitlesService {
         titlesList.addAll(filterKills(kills, rounds));
         titlesList.addAll(filterPlayers(players));
         titlesList.addAll(filterGrenades(grenades));
-        titlesList.addAll(filterPrecision(shots, damages));
+        titlesList.addAll(filterPrecision(shotsData, damagesData));
         titlesList.addAll(filterClutches(clutches));
         titlesList.addAll(filterBlinds(playerBlinds));
         titlesList.addAll(filterPlants(bombsPlanted));
@@ -197,11 +215,11 @@ public class TitlesService {
         titlesList.addAll(filterFakePlants(bombsPlanted,bombsPlantStart));
         titlesList.addAll(filterFakeDefuse(bombsDefused,bombsDefuseStart));
         titlesList.addAll(filterChicken(chickenDeaths));
-        titlesList.addAll(filterPlayerBuys(playerBuys));
+        titlesList.addAll(filterRefunds(playerRefundsData));
         titlesList.addAll(filterPlayerEconomies(playerEconomies));
-        titlesList.addAll(filterShots(shots));
-        titlesList.addAll(filterDesperdicios(playerBuys,grenades));
-        titlesList.addAll(filterBounces(grenadeBounces));
+        titlesList.addAll(filterShots(shotsData));
+        titlesList.addAll(filterWastes(playerGrenadeBuysData,grenadeThrowsData));
+        titlesList.addAll(filterBounces(grenadeBouncesData));
 
         // Liberar referencias a las listas
         logger.info("Liberando memoria");
@@ -213,14 +231,16 @@ public class TitlesService {
         bombsPlantStart = null;
         grenades = null;
         playerEconomies = null;
-        shots = null;
+        shotsData = null;
         chickenDeaths = null;
         playerBlinds = null;
-        playerBuys = null;
-        damages = null;
-        grenadeBounces = null;
+        playerRefundsData = null;
+        damagesData = null;
+        grenadeBouncesData = null;
         clutches = null;
         rounds = null;
+        playerGrenadeBuysData = null;
+        grenadeThrowsData = null;
 
         return titlesList;
     }
@@ -639,19 +659,20 @@ public class TitlesService {
 
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
         
+        // Calculando precisión a partir de tiros y daño
         Map<String, Double> precisionMap = damagesData.stream()
             .collect(Collectors.toMap(
-                stat -> utils.convertSteamIdToName(stat.getPlayerSteamId()),
+                stat -> utils.convertSteamIdToName(stat.getPlayer()),
                 stat -> Integer.valueOf(stat.getValue().toString())
             ))
             .entrySet().stream()
             .filter(entry -> entry.getValue() > 0)
             .flatMap(damageEntry -> shotsData.stream()
-                .filter(shotStat -> shotStat.getPlayerName().equals(damageEntry.getKey()))
+                .filter(shotStat -> shotStat.getPlayer().equals(damageEntry.getKey()))
                 .map(shotStat -> {
                     Integer shots = Integer.valueOf(shotStat.getValue().toString());
-                    double precision = (double) shots / damageEntry.getValue() * 100;
-                    return Map.entry(damageEntry.getKey(), precision);
+                    double precision = damageEntry.getValue() / (double) shots * 100;
+                    return Map.entry(shotStat.getPlayer(), precision);
                 })
             )
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -660,32 +681,9 @@ public class TitlesService {
         titlesList.add(precisionMap.entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostprecision",utils.convertSteamIdToName(entry.getKey()),String.format("%.2f", entry.getValue())))
+            .map(entry -> buildTitle("mostprecision",entry.getKey(),String.format("%.2f", entry.getValue())))
             .orElse(buildTitle("mostprecision","-","-")));
 
-
-
-        titlesList.add(buildTitle("mostprecision","-","-"));
-
-        //  Título de mejor precisión
-        titlesList.add(damages.stream()
-            .filter(damage -> Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID)
-                .contains(damage.getAttackerSteamId()))
-            .filter(damage -> !Arrays.asList("HE Grenade", "Incendiary Grenade", "Molotov").contains(damage.getWeaponName()))
-            .collect(Collectors.groupingBy(Damages::getAttackerSteamId, Collectors.counting()))
-            .entrySet()
-            .stream()
-            .map(entry -> {
-                String playerId = entry.getKey();
-                long totalShots = shots.stream()
-                    .filter(shot -> shot.getPlayerSteamId().equals(playerId))
-                    .count();
-                double precision = (double) entry.getValue() / totalShots * 100;
-                return Map.entry(playerId, precision);
-            })
-            .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostprecision",utils.convertSteamIdToName(entry.getKey()),String.format("%.2f", entry.getValue())))
-            .orElse(buildTitle("mostprecision","-","-")));
         return titlesList;
     }
 
@@ -919,94 +917,78 @@ public class TitlesService {
         return titlesList;
     }
 
-    private List<FullTitleDTO> filterPlayerBuys (List<PlayerBuys> playerBuys){
+    private List<FullTitleDTO> filterRefunds (List<StatisticDTO> playerRefundsData){
 
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
 
-        //  Título de más devoluciones de armas
-        titlesList.add(playerBuys.stream()
-            .filter(buy -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
-                .contains(buy.getPlayerName()))
-            .filter(buy -> buy.isHasRefunded())
-            .collect(Collectors.groupingBy(PlayerBuys::getPlayerName, Collectors.counting()))
-            .entrySet()
-            .stream()
-            .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostrefunds",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostrefunds","-","-")));
+        //  Título de más devoluciones
+        titlesList.add(playerRefundsData.stream()
+        .max((r1, r2) -> Integer.compare(Integer.valueOf(r1.getValue().toString()), Integer.valueOf(r2.getValue().toString())))
+        .map(stat -> buildTitle("mostrefunds", stat.getPlayer(), String.format("%,d", Integer.valueOf(stat.getValue().toString()))))
+        .orElse(buildTitle("mostrefunds","-","-")));
 
         return titlesList;
     }
 
-    private List<FullTitleDTO> filterShots (List<Shots> shots){
+    private List<FullTitleDTO> filterShots (List<StatisticDTO> shots){
         
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
 
         //  Título de más tiros
         titlesList.add(shots.stream()
-            .filter(shot -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
-                .contains(shot.getPlayerName()))
-            .collect(Collectors.groupingBy(Shots::getPlayerName, Collectors.counting()))
-            .entrySet()
-            .stream()
-            .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostshots",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostshots","-","-")));
+        .max((s1, s2) -> Integer.compare(Integer.valueOf(s1.getValue().toString()), Integer.valueOf(s2.getValue().toString())))
+        .map(stat -> buildTitle("mostshots", stat.getPlayer(), String.format("%,d", Integer.valueOf(stat.getValue().toString()))))
+        .orElse(buildTitle("mostshots","-","-")));
 
         //  Título de menos tiros
         titlesList.add(shots.stream()
-            .filter(shot -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
-                .contains(shot.getPlayerName()))
-            .collect(Collectors.groupingBy(Shots::getPlayerName, Collectors.counting()))
-            .entrySet()
-            .stream()
-            .min(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("lessshots",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("lessshots","-","-")));
+        .min((s1, s2) -> Integer.compare(Integer.valueOf(s1.getValue().toString()), Integer.valueOf(s2.getValue().toString())))
+        .map(stat -> buildTitle("mostshots", stat.getPlayer(), String.format("%,d", Integer.valueOf(stat.getValue().toString()))))
+        .orElse(buildTitle("mostshots","-","-")));
 
         return titlesList;
     }
 
-    private List<FullTitleDTO> filterBounces (List<GrenadeBounces> bounces){
+    private List<FullTitleDTO> filterBounces (List<StatisticDTO> bouncesData){
         
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
 
         //  Título de más rebotes de granadas
-        titlesList.add(bounces.stream()
-            .filter(bounce -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
-                .contains(bounce.getThrowerName()))
-            .collect(Collectors.groupingBy(GrenadeBounces::getThrowerName, Collectors.counting()))
-            .entrySet()
-            .stream()
-            .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostgrenadebounces",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostgrenadebounces","-","-")));
+        titlesList.add(bouncesData.stream()
+        .max((b1, b2) -> Integer.compare(Integer.valueOf(b1.getValue().toString()), Integer.valueOf(b2.getValue().toString())))
+        .map(stat -> buildTitle("mostgrenadebounces", stat.getPlayer(), String.format("%,d", Integer.valueOf(stat.getValue().toString()))))
+        .orElse(buildTitle("mostgrenadebounces","-","-")));
 
         return titlesList;
     }
 
-    private List<FullTitleDTO> filterDesperdicios (List<PlayerBuys> playerBuys, List<GrenadeProjectilesDestroy> grenades){
-        
-        List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
+    private List<FullTitleDTO> filterWastes (List<StatisticDTO> playerGrenadeBuysData, List<StatisticDTO> grenadeThrowsData){
 
-        //  Título de más granadas desperdiciadas
-        titlesList.add(playerBuys.stream()
-            .filter(buy -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
-                .contains(buy.getPlayerName()))
-            .filter(buy -> !buy.isHasRefunded())
-            .collect(Collectors.groupingBy(PlayerBuys::getPlayerName, Collectors.counting()))
-            .entrySet()
+        List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
+        
+        // Calculando desperdicios a partir de compras y lanzamientos
+        Map<String, Integer> wastesMap = playerGrenadeBuysData.stream()
+            .collect(Collectors.toMap(
+                stat -> stat.getPlayer(),
+                stat -> Integer.valueOf(stat.getValue().toString())
+            ))
+            .entrySet().stream()
+            .filter(entry -> entry.getValue() > 0)
+            .flatMap(buysEntry -> grenadeThrowsData.stream()
+                .filter(throwStat -> throwStat.getPlayer().equals(buysEntry.getKey()))
+                .map(throwStat -> {
+                    Integer throwsCount = Integer.valueOf(throwStat.getValue().toString());
+                    Integer wastes = buysEntry.getValue() - throwsCount;
+                    return Map.entry(buysEntry.getKey(), wastes);
+                })
+            )
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        //  Título de mejor precisión
+        titlesList.add(wastesMap.entrySet()
             .stream()
-            .map(entry -> {
-                String playerName = entry.getKey();
-                long grenadesThrown = grenades.stream()
-                .filter(grenade -> grenade.getThrowerName().equals(playerName))
-                .count();
-                long grenadesWasted = entry.getValue() - grenadesThrown;
-                return Map.entry(playerName, grenadesWasted);
-            })
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostunusedgrenades",entry.getKey(),String.format("%,d",entry.getValue())))
+            .map(entry -> buildTitle("mostunusedgrenades", entry.getKey(), String.format("%,d", entry.getValue())))
             .orElse(buildTitle("mostunusedgrenades","-","-")));
 
         return titlesList;
