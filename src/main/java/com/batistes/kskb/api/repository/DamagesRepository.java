@@ -18,4 +18,9 @@ public interface DamagesRepository extends JpaRepository<Damages, Long> {
 
     @Query("SELECT d FROM Damages d JOIN Matches m ON d.matchChecksum = m.checksum WHERE m.date BETWEEN :startDate AND :endDate AND (d.attackerSteamId IN :playerIds OR d.victimSteamId IN :playerIds)")
     public List<Damages> findByAttackerSteamIdOrVictimSteamIdInBetweenDates(@Param("playerIds") List<String>playerIds, Date startDate, Date endDate);
+
+    @Query("SELECT d.attackerSteamId as player, COUNT(*) as value FROM Damages d JOIN Matches m ON d.matchChecksum = m.checksum " +
+            "WHERE m.date BETWEEN :startDate AND :endDate AND (d.attackerSteamId IN :players) " +
+            "AND d.weaponType != 'grenade' GROUP BY d.attackerSteamId")
+    List<StatisticDTO> countDamagesByAttackerSteamIdInBetweenDates(List<String> players, Date startDate, Date endDate);
 }

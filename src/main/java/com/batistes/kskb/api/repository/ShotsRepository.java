@@ -15,4 +15,10 @@ public interface ShotsRepository extends JpaRepository<Shots, Long> {
 
     @Query("SELECT s FROM Shots s JOIN Matches m ON s.matchChecksum = m.checksum WHERE m.date BETWEEN :startDate AND :endDate AND (s.playerName IN :players)")
     List<Shots> findByPlayerNameInBetweenDates(List<String> players, Date startDate, Date endDate);
+
+    @Query("SELECT s.playerName as player, COUNT(*) as value FROM Shots s JOIN Matches m ON s.matchChecksum = m.checksum " +
+            "WHERE m.date BETWEEN :startDate AND :endDate AND (s.playerName IN :players) " +
+            "AND s.weaponName NOT IN ('HE Grenade', 'Incendiary Grenade', 'Molotov') GROUP BY s.playerName")
+    List<StatisticDTO> countShotsByPlayerNameInBetweenDates(List<String> players, Date startDate, Date endDate);
+
 }

@@ -153,11 +153,7 @@ public class TitlesService {
             startDate, endDate);
   
         logger.info("Player economies data Finished");  
-        List<Shots> shots = shotsRepository.findByPlayerNameInBetweenDates(
-            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
-            startDate, endDate);
         
-        logger.info("Shots data Finished");
         List<ChickenDeaths> chickenDeaths = chickenDeathsRepository.findByKillerSteamIdInBetweenDates(
             Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID),
             startDate, endDate);
@@ -168,20 +164,6 @@ public class TitlesService {
             startDate, endDate);
         
         logger.info("Player blinds data Finished");
-        List<PlayerBuys> playerBuys = playerBuysRepository.findByPlayerNameInBetweenDates(
-            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
-            startDate, endDate);
-        
-        logger.info("Player buys data Finished");
-        List<Damages> damages = damagesRepository.findByAttackerSteamIdOrVictimSteamIdInBetweenDates(
-            Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID),
-            startDate, endDate);
-        
-        logger.info("Damages data Finished");
-        List<GrenadeBounces> grenadeBounces = grenadeBouncesRepository.findByThrowerNameInBetweenDates(
-            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
-            startDate, endDate);
-        logger.info("Grenade bounces data Finished");
 
         List<Clutches> clutches = clutchesRepository.findByClutcherNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
@@ -190,6 +172,15 @@ public class TitlesService {
 
         List<Rounds> rounds = roundsRepository.findAll();
         logger.info("Rounds data Finished");
+
+        List<StatisticDTO> shotsData = shotsRepository.countShotsByPlayerNameInBetweenDates(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            startDate, endDate);
+
+        List<StatisticDTO> damagesData = damagesRepository.countDamagesByAttackerSteamIdInBetweenDates(
+            Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID),
+            startDate, endDate);
+        logger.info("Shots data Finished");
 
         logger.info("SQL Finished");
 
@@ -644,10 +635,38 @@ public class TitlesService {
         return titlesList;
     }
 
-    private List<FullTitleDTO> filterPrecision (List<Shots> shots, List<Damages> damages){
+    private List<FullTitleDTO> filterPrecision (List<StatisticDTO> shotsData, List<StatisticDTO> damagesData){
 
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
         
+        Map<String, Double> precisionMap = damagesData.stream()
+            .collect(Collectors.toMap(
+                stat -> utils.convertSteamIdToName(stat.getPlayerSteamId()),
+                stat -> Integer.valueOf(stat.getValue().toString())
+            ))
+            .entrySet().stream()
+            .filter(entry -> entry.getValue() > 0)
+            .flatMap(damageEntry -> shotsData.stream()
+                .filter(shotStat -> shotStat.getPlayerName().equals(damageEntry.getKey()))
+                .map(shotStat -> {
+                    Integer shots = Integer.valueOf(shotStat.getValue().toString());
+                    double precision = (double) shots / damageEntry.getValue() * 100;
+                    return Map.entry(damageEntry.getKey(), precision);
+                })
+            )
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        //  Título de mejor precisión
+        titlesList.add(precisionMap.entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(entry -> buildTitle("mostprecision",utils.convertSteamIdToName(entry.getKey()),String.format("%.2f", entry.getValue())))
+            .orElse(buildTitle("mostprecision","-","-")));
+
+
+
+        titlesList.add(buildTitle("mostprecision","-","-"));
+
         //  Título de mejor precisión
         titlesList.add(damages.stream()
             .filter(damage -> Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID)
