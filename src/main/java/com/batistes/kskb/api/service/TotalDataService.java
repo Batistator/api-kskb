@@ -7,25 +7,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.batistes.kskb.api.dto.StatisticDTO;
 import com.batistes.kskb.api.dto.TotalDataDTO;
 import com.batistes.kskb.api.entity.BombsDefused;
 import com.batistes.kskb.api.entity.BombsPlanted;
 import com.batistes.kskb.api.entity.ChickenDeaths;
-import com.batistes.kskb.api.entity.Damages;
-import com.batistes.kskb.api.entity.GrenadeBounces;
-import com.batistes.kskb.api.entity.GrenadeProjectilesDestroy;
 import com.batistes.kskb.api.entity.Kills;
 import com.batistes.kskb.api.entity.PlayerBlinds;
-import com.batistes.kskb.api.entity.PlayerBuys;
 import com.batistes.kskb.api.entity.PlayerEconomies;
 import com.batistes.kskb.api.entity.Players;
-import com.batistes.kskb.api.entity.Shots;
 import com.batistes.kskb.api.repository.BombsDefusedRepository;
 import com.batistes.kskb.api.repository.BombsPlantedRepository;
 import com.batistes.kskb.api.repository.ChickenDeathsRepository;
@@ -82,6 +79,9 @@ public class TotalDataService {
     @Autowired
     private Constants constants;
 
+    @Autowired
+    private Utils utils;
+
     //TODO: Optimizar método de obtención de datos.
 
     public String getTotalData(Date startDate, Date endDate){
@@ -109,21 +109,11 @@ public class TotalDataService {
             startDate, endDate);
         
         logger.info("Bombs planted data Finished");
-        List<GrenadeProjectilesDestroy> grenades = grenadeProjectilesDestroyRepository.findByThrowerNameInBetweenDates(
-            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
-            startDate, endDate);
-        
-        logger.info("Grenade projectile destroy data Finished");
         List<PlayerEconomies> playerEconomies = playerEconomiesRepository.findByPlayerNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
   
         logger.info("Player economies data Finished");  
-        List<Shots> shots = shotsRepository.findByPlayerNameInBetweenDates(
-            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
-            startDate, endDate);
-        
-        logger.info("Shots data Finished");
         List<ChickenDeaths> chickenDeaths = chickenDeathsRepository.findByKillerSteamIdInBetweenDates(
             Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID),
             startDate, endDate);
@@ -134,20 +124,70 @@ public class TotalDataService {
             startDate, endDate);
         
         logger.info("Player blinds data Finished");
-        List<Damages> damages = damagesRepository.findByAttackerSteamIdOrVictimSteamIdInBetweenDates(
+        List<StatisticDTO> shotsData = shotsRepository.countShotsByPlayerNameInBetweenDates(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            startDate, endDate);
+        logger.info("Shots data Finished");
+
+        List<StatisticDTO> damagesData = damagesRepository.countDamagesByAttackerSteamIdInBetweenDates(
             Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID),
             startDate, endDate);
-        
         logger.info("Damages data Finished");
-        List<GrenadeBounces> grenadeBounces = grenadeBouncesRepository.findByThrowerNameInBetweenDates(
-            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
-            startDate, endDate);
-        logger.info("Grenade bounces data Finished");
 
-        List<PlayerBuys> grenadeBuys = playerBuysRepository.findByPlayerNameInBetweenDates(
+        List<StatisticDTO> allyDamagesData = damagesRepository.sumTeamDamagesByAttackerSteamIdInBetweenDates(
+            Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID),
+            startDate, endDate);
+        logger.info("Ally damages data Finished");
+
+        List<StatisticDTO> selfDamagesData = damagesRepository.sumSelfDamagesByAttackerSteamIdInBetweenDates(
+            Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID),
+            startDate, endDate);
+        logger.info("Self damages data Finished");
+
+        List<StatisticDTO> grenadeBouncesData = grenadeBouncesRepository.countBouncesByPlayerNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
-        logger.info("Player buys data Finished");
+        logger.info("Grenade Bounces data Finished");
+
+        List<StatisticDTO> playerGrenadeBuysData = playerBuysRepository.findGrenadeBuysByPlayerNameInBetweenDates(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            startDate, endDate);
+        logger.info("Player Grenade Buys data Finished");
+
+        List<StatisticDTO> grenadeThrowsData = grenadeProjectilesDestroyRepository.countGrenadesByThrowerNameInBetweenDates(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            startDate, endDate);
+        logger.info("Player Grenade Throws data Finished");
+
+        List<StatisticDTO> heThrowsData = grenadeProjectilesDestroyRepository.countGrenadesByThrowerNameInAndTypeInBetweenDates(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            Arrays.asList("HE Grenade"),
+            startDate, endDate);
+        logger.info("Player HE Throws data Finished");
+
+        List<StatisticDTO> smokeThrowsData = grenadeProjectilesDestroyRepository.countGrenadesByThrowerNameInAndTypeInBetweenDates(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            Arrays.asList("Smoke Grenade"),
+            startDate, endDate);
+        logger.info("Player Smoke Throws data Finished");
+
+        List<StatisticDTO> molotovThrowsData = grenadeProjectilesDestroyRepository.countGrenadesByThrowerNameInAndTypeInBetweenDates(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            Arrays.asList("Incendiary Grenade","Molotov"),
+            startDate, endDate);
+        logger.info("Player Fires Throws data Finished");
+
+        List<StatisticDTO> decoyThrowsData = grenadeProjectilesDestroyRepository.countGrenadesByThrowerNameInAndTypeInBetweenDates(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            Arrays.asList("Decoy Grenade"),
+            startDate, endDate);
+        logger.info("Player Decoy Throws data Finished");
+
+        List<StatisticDTO> flashThrowsData = grenadeProjectilesDestroyRepository.countGrenadesByThrowerNameInAndTypeInBetweenDates(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            Arrays.asList("Flashbang"),
+            startDate, endDate);
+        logger.info("Player Flash Throws data Finished");
 
         logger.info("SQL Finished");
 
@@ -157,13 +197,15 @@ public class TotalDataService {
         totalData.putAll(this.filterPlayers(players));
         totalData.putAll(this.filterBombsDefused(bombsDefused));
         totalData.putAll(this.filterBombsPlanted(bombsPlanted));
-        totalData.putAll(this.filterGrenades(grenades, grenadeBuys));
         totalData.putAll(this.filterPlayerEconomies(playerEconomies));
-        totalData.putAll(this.filterShots(shots, damages));
+        totalData.putAll(this.filterShots(shotsData, damagesData));
         totalData.putAll(this.filterChickens(chickenDeaths));
-        totalData.putAll(this.filterBounces(grenadeBounces));
-        totalData.putAll(this.filterDamages(damages));
+        totalData.putAll(this.filterBounces(grenadeBouncesData));
+        totalData.putAll(this.filterDamages(allyDamagesData, selfDamagesData));
         totalData.putAll(this.filterBlinds(playerBlinds));
+        totalData.putAll(this.filterWastes(grenadeThrowsData, playerGrenadeBuysData, 
+                                           heThrowsData, smokeThrowsData, molotovThrowsData, 
+                                           decoyThrowsData, flashThrowsData));
 
         logger.info("Java process Finished");
         
@@ -180,6 +222,28 @@ public class TotalDataService {
 
         //Convertimos el LIST en un STRING JSON
         String result = Utils.convertToJSON(totalDataList);
+
+        // Liberar referencias a las listas
+        logger.info("Liberando memoria");
+        players = null;
+        kills = null;
+        bombsDefused = null;
+        bombsPlanted = null;
+        playerEconomies = null;
+        shotsData = null;
+        chickenDeaths = null;
+        playerBlinds = null;
+        damagesData = null;
+        grenadeBouncesData = null;
+        playerGrenadeBuysData = null;
+        grenadeThrowsData = null;
+        heThrowsData = null;
+        smokeThrowsData = null;
+        molotovThrowsData = null;
+        decoyThrowsData = null;
+        flashThrowsData = null;
+        allyDamagesData = null;
+        selfDamagesData = null;
 
         return result;
     }
@@ -320,57 +384,72 @@ public class TotalDataService {
         return blindsMap;
     }
 
-    private Map<String, TotalDataDTO> filterDamages (List<Damages> totalDamages){
+    private Map<String, TotalDataDTO> filterDamages (List<StatisticDTO> allyDamagesData, List<StatisticDTO> selfDamagesData){
         Map<String, TotalDataDTO> damagesMap = new HashMap<>();
         
         TotalDataDTO damages = new TotalDataDTO();
         damages.setIcon("/icons/total_data/ally_damage.png"); 
-        damages.setShinchan(String.valueOf(totalDamages.stream()
-            .filter(damage -> constants.SHINCHAN_STEAM_ID.equals(damage.getAttackerSteamId()) &&
-            Arrays.asList(constants.SWAGCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID).contains(damage.getVictimSteamId()))
-            .mapToInt(damage -> Integer.parseInt(damage.getArmorDamage()) + Integer.parseInt(damage.getHealthDamage())).sum()));
-        damages.setKazama(String.valueOf(totalDamages.stream()
-            .filter(damage -> constants.KAZAMA_STEAM_ID.equals(damage.getAttackerSteamId()) &&
-            Arrays.asList(constants.SWAGCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.SHINCHAN_STEAM_ID, constants.MAFIOS_STEAM_ID).contains(damage.getVictimSteamId()))
-            .mapToInt(damage -> Integer.parseInt(damage.getArmorDamage()) + Integer.parseInt(damage.getHealthDamage())).sum()));
-        damages.setMafios(String.valueOf(totalDamages.stream()
-            .filter(damage -> constants.MAFIOS_STEAM_ID.equals(damage.getAttackerSteamId()) &&
-            Arrays.asList(constants.SWAGCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.SHINCHAN_STEAM_ID).contains(damage.getVictimSteamId()))
-            .mapToInt(damage -> Integer.parseInt(damage.getArmorDamage()) + Integer.parseInt(damage.getHealthDamage())).sum()));
-        damages.setNene(String.valueOf(totalDamages.stream()
-            .filter(damage -> constants.NENE_STEAM_ID.equals(damage.getAttackerSteamId()) &&
-            Arrays.asList(constants.SWAGCHAN_STEAM_ID, constants.SHINCHAN_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID).contains(damage.getVictimSteamId()))
-            .mapToInt(damage -> Integer.parseInt(damage.getArmorDamage()) + Integer.parseInt(damage.getHealthDamage())).sum()));
-        damages.setSwagchan(String.valueOf(totalDamages.stream()
-            .filter(damage -> constants.SWAGCHAN_STEAM_ID.equals(damage.getAttackerSteamId()) &&
-            Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID).contains(damage.getVictimSteamId()))
-            .mapToInt(damage -> Integer.parseInt(damage.getArmorDamage()) + Integer.parseInt(damage.getHealthDamage())).sum()));
+        int allyDamageShinchan = allyDamagesData.stream()
+            .filter(damage -> constants.SHINCHAN_STEAM_ID.equals(damage.getPlayer()))
+            .mapToInt(stat -> Integer.parseInt(stat.getValue().toString())).sum();
+        int selfDamageShinchan = selfDamagesData.stream()
+            .filter(damage -> constants.SHINCHAN_STEAM_ID.equals(damage.getPlayer()))
+            .mapToInt(stat -> Integer.parseInt(stat.getValue().toString())).sum();
+        damages.setShinchan(String.valueOf(allyDamageShinchan - selfDamageShinchan));
+        int allyDamageKazama = allyDamagesData.stream()
+            .filter(damage -> constants.KAZAMA_STEAM_ID.equals(damage.getPlayer()))
+            .mapToInt(stat -> Integer.parseInt(stat.getValue().toString())).sum();
+        int selfDamageKazama = selfDamagesData.stream()
+            .filter(damage -> constants.KAZAMA_STEAM_ID.equals(damage.getPlayer()))
+            .mapToInt(stat -> Integer.parseInt(stat.getValue().toString())).sum();
+        damages.setKazama(String.valueOf(allyDamageKazama - selfDamageKazama));
+        int allyDamageMafios = allyDamagesData.stream()
+            .filter(damage -> constants.MAFIOS_STEAM_ID.equals(damage.getPlayer()))
+            .mapToInt(stat -> Integer.parseInt(stat.getValue().toString())).sum();
+        int selfDamageMafios = selfDamagesData.stream()
+            .filter(damage -> constants.MAFIOS_STEAM_ID.equals(damage.getPlayer()))
+            .mapToInt(stat -> Integer.parseInt(stat.getValue().toString())).sum();
+        damages.setMafios(String.valueOf(allyDamageMafios - selfDamageMafios));
+        int allyDamageNene = allyDamagesData.stream()
+            .filter(damage -> constants.NENE_STEAM_ID.equals(damage.getPlayer()))
+            .mapToInt(stat -> Integer.parseInt(stat.getValue().toString())).sum();
+        int selfDamageNene = selfDamagesData.stream()
+            .filter(damage -> constants.NENE_STEAM_ID.equals(damage.getPlayer()))
+            .mapToInt(stat -> Integer.parseInt(stat.getValue().toString())).sum();
+        damages.setNene(String.valueOf(allyDamageNene - selfDamageNene));
+        int allyDamageSwagchan = allyDamagesData.stream()
+            .filter(damage -> constants.SWAGCHAN_STEAM_ID.equals(damage.getPlayer()))
+            .mapToInt(stat -> Integer.parseInt(stat.getValue().toString())).sum();
+        int selfDamageSwagchan = selfDamagesData.stream()
+            .filter(damage -> constants.SWAGCHAN_STEAM_ID.equals(damage.getPlayer()))
+            .mapToInt(stat -> Integer.parseInt(stat.getValue().toString())).sum();
+        damages.setSwagchan(String.valueOf(allyDamageSwagchan - selfDamageSwagchan));
         damages.setCustomOrder(18);
         damagesMap.put("Daño a aliados", damages);
         
         return damagesMap;
     }
 
-    private Map<String, TotalDataDTO> filterBounces (List<GrenadeBounces> totalgrenadeBounces){
+    private Map<String, TotalDataDTO> filterBounces (List<StatisticDTO> grenadeBouncesData){
         Map<String, TotalDataDTO> bouncesMap = new HashMap<>();
 
         TotalDataDTO bounces = new TotalDataDTO();
         bounces.setIcon("/icons/total_data/bounces.png");
-        bounces.setShinchan(String.valueOf(totalgrenadeBounces.stream()
-            .filter(bounce -> constants.PLAYER_SHINCHAN.equals(bounce.getThrowerName()))
-            .count()));
-        bounces.setKazama(String.valueOf(totalgrenadeBounces.stream()
-            .filter(bounce -> constants.PLAYER_KAZAMA.equals(bounce.getThrowerName()))
-            .count()));
-        bounces.setMafios(String.valueOf(totalgrenadeBounces.stream()
-            .filter(bounce -> constants.PLAYER_MAFIOS.equals(bounce.getThrowerName()))
-            .count()));
-        bounces.setNene(String.valueOf(totalgrenadeBounces.stream()
-            .filter(bounce -> constants.PLAYER_NENE.equals(bounce.getThrowerName()))
-            .count()));
-        bounces.setSwagchan(String.valueOf(totalgrenadeBounces.stream()
-            .filter(bounce -> constants.PLAYER_SHINCHAN.equals(bounce.getThrowerName()))
-            .count()));
+        bounces.setShinchan(grenadeBouncesData.stream()
+            .filter(bounce -> constants.PLAYER_SHINCHAN.equals(bounce.getPlayer())).findFirst().map(StatisticDTO::getValue)
+            .orElse("0").toString());
+        bounces.setKazama(grenadeBouncesData.stream()
+            .filter(bounce -> constants.PLAYER_KAZAMA.equals(bounce.getPlayer())).findFirst().map(StatisticDTO::getValue)
+            .orElse("0").toString());
+        bounces.setMafios(grenadeBouncesData.stream()
+            .filter(bounce -> constants.PLAYER_MAFIOS.equals(bounce.getPlayer())).findFirst().map(StatisticDTO::getValue)
+            .orElse("0").toString());
+        bounces.setNene(grenadeBouncesData.stream()
+            .filter(bounce -> constants.PLAYER_NENE.equals(bounce.getPlayer())).findFirst().map(StatisticDTO::getValue)
+            .orElse("0").toString());
+        bounces.setSwagchan(grenadeBouncesData.stream()
+            .filter(bounce -> constants.PLAYER_SWAGCHAN.equals(bounce.getPlayer())).findFirst().map(StatisticDTO::getValue)
+            .orElse("0").toString());
         bounces.setCustomOrder(30);
         bouncesMap.put("Rebotes de granadas", bounces);
 
@@ -403,51 +482,56 @@ public class TotalDataService {
         return chickenMap;
     }
 
-    private Map<String, TotalDataDTO> filterShots (List<Shots> totalShots, List<Damages> totalDamages){
+    private Map<String, TotalDataDTO> filterShots (List<StatisticDTO> shotsData, List<StatisticDTO> damagesData){
         Map<String, TotalDataDTO> shotsMap = new HashMap<>();
 
         TotalDataDTO shots = new TotalDataDTO();
         shots.setIcon("/icons/total_data/shots.png");
-        shots.setShinchan(String.valueOf(totalShots.stream()
-            .filter(shot -> constants.PLAYER_SHINCHAN.equals(shot.getPlayerName()))
-            .count()));
-        shots.setKazama(String.valueOf(totalShots.stream()
-            .filter(shot -> constants.PLAYER_KAZAMA.equals(shot.getPlayerName()))
-            .count()));
-        shots.setMafios(String.valueOf(totalShots.stream()
-            .filter(shot -> constants.PLAYER_MAFIOS.equals(shot.getPlayerName()))
-            .count()));
-        shots.setNene(String.valueOf(totalShots.stream()
-            .filter(shot -> constants.PLAYER_NENE.equals(shot.getPlayerName()))
-            .count()));
-        shots.setSwagchan(String.valueOf(totalShots.stream()
-            .filter(shot -> constants.PLAYER_SWAGCHAN.equals(shot.getPlayerName()))
-            .count()));
+        shots.setShinchan(shotsData.stream()
+            .filter(shot -> constants.PLAYER_SHINCHAN.equals(shot.getPlayer())).findFirst().map(StatisticDTO::getValue)
+            .orElse("0").toString());
+        shots.setKazama(shotsData.stream()
+            .filter(shot -> constants.PLAYER_KAZAMA.equals(shot.getPlayer())).findFirst().map(StatisticDTO::getValue)
+            .orElse("0").toString());
+        shots.setMafios(shotsData.stream()
+            .filter(shot -> constants.PLAYER_MAFIOS.equals(shot.getPlayer())).findFirst().map(StatisticDTO::getValue)
+            .orElse("0").toString());
+        shots.setNene(shotsData.stream()
+            .filter(shot -> constants.PLAYER_NENE.equals(shot.getPlayer())).findFirst().map(StatisticDTO::getValue)
+            .orElse("0").toString());
+        shots.setSwagchan(shotsData.stream()
+            .filter(shot -> constants.PLAYER_SWAGCHAN.equals(shot.getPlayer())).findFirst().map(StatisticDTO::getValue)
+            .orElse("0").toString());
         shots.setCustomOrder(38);
         shotsMap.put("Disparos", shots);
 
+
+        // Calculando precisión a partir de tiros y daño
+        Map<String, Double> precisionMap = damagesData.stream()
+            .collect(Collectors.toMap(
+                stat -> utils.convertSteamIdToName(stat.getPlayer()),
+                stat -> Integer.valueOf(stat.getValue().toString())
+            ))
+            .entrySet().stream()
+            .filter(entry -> entry.getValue() > 0)
+            .flatMap(damageEntry -> shotsData.stream()
+                .filter(shotStat -> shotStat.getPlayer().equals(damageEntry.getKey()))
+                .map(shotStat -> {
+                    Integer shotsFired = Integer.valueOf(shotStat.getValue().toString());
+                    double precision = damageEntry.getValue() / (double) shotsFired * 100;
+                    return Map.entry(shotStat.getPlayer(), precision);
+                })
+            )
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        // Setteando los valores desde el map anterior
         TotalDataDTO precision = new TotalDataDTO();
         precision.setIcon("/icons/total_data/precision.png");
-        precision.setShinchan(String.format("%.2f",
-            Double.valueOf(totalDamages.stream()
-            .filter(damage -> constants.SHINCHAN_STEAM_ID.equals(damage.getAttackerSteamId()) && 
-            !Arrays.asList("HE Grenade", "Incendiary Grenade", "Molotov").contains(damage.getWeaponName())).count()) / Double.valueOf(shots.getShinchan()) * 100) + "%");
-        precision.setKazama(String.format("%.2f",
-            Double.valueOf(totalDamages.stream()
-            .filter(damage -> constants.KAZAMA_STEAM_ID.equals(damage.getAttackerSteamId()) && 
-            !Arrays.asList("HE Grenade", "Incendiary Grenade", "Molotov").contains(damage.getWeaponName())).count()) / Double.valueOf(shots.getKazama()) * 100) + "%");
-        precision.setMafios(String.format("%.2f",
-            Double.valueOf(totalDamages.stream()
-            .filter(damage -> constants.MAFIOS_STEAM_ID.equals(damage.getAttackerSteamId()) && 
-            !Arrays.asList("HE Grenade", "Incendiary Grenade", "Molotov").contains(damage.getWeaponName())).count()) / Double.valueOf(shots.getMafios()) * 100) + "%");
-        precision.setNene(String.format("%.2f",
-            Double.valueOf(totalDamages.stream()
-            .filter(damage -> constants.NENE_STEAM_ID.equals(damage.getAttackerSteamId()) && 
-            !Arrays.asList("HE Grenade", "Incendiary Grenade", "Molotov").contains(damage.getWeaponName())).count()) / Double.valueOf(shots.getNene()) * 100) + "%");
-        precision.setSwagchan(String.format("%.2f",
-            Double.valueOf(totalDamages.stream()
-            .filter(damage -> constants.SWAGCHAN_STEAM_ID.equals(damage.getAttackerSteamId()) && 
-            !Arrays.asList("HE Grenade", "Incendiary Grenade", "Molotov").contains(damage.getWeaponName())).count()) / Double.valueOf(shots.getSwagchan()) * 100) + "%");
+        precision.setShinchan(String.format("%.2f",precisionMap.get(constants.PLAYER_SHINCHAN)) + "%");
+        precision.setKazama(String.format("%.2f",precisionMap.get(constants.PLAYER_KAZAMA)) + "%");
+        precision.setMafios(String.format("%.2f",precisionMap.get(constants.PLAYER_MAFIOS)) + "%"); 
+        precision.setNene(String.format("%.2f",precisionMap.get(constants.PLAYER_NENE)) + "%");
+        precision.setSwagchan(String.format("%.2f",precisionMap.get(constants.PLAYER_SWAGCHAN)) + "%");
         precision.setCustomOrder(39);
         shotsMap.put("Precisión", precision);
 
@@ -480,136 +564,141 @@ public class TotalDataService {
         return economiesMap;
     }
 
-    private Map<String, TotalDataDTO> filterGrenades (List<GrenadeProjectilesDestroy> totalGrenades, List<PlayerBuys> grenadeBuys){
+    private Map<String, TotalDataDTO> filterWastes (List<StatisticDTO> grenadeThrowsData, List<StatisticDTO> grenadeBuysData,
+                                                    List<StatisticDTO> heThrowsData, List<StatisticDTO> smokeThrowsData, 
+                                                    List<StatisticDTO> molotovThrowsData, List<StatisticDTO> decoyThrowsData, 
+                                                    List<StatisticDTO> flashThrowsData){
+
         Map<String, TotalDataDTO> grenadesMap = new HashMap<>();
+
+        // Calculando desperdicios a partir de compras y lanzamientos
+        Map<String, Integer> wastesMap = grenadeBuysData.stream()
+            .collect(Collectors.toMap(
+                stat -> stat.getPlayer(),
+                stat -> Integer.valueOf(stat.getValue().toString())
+            ))
+            .entrySet().stream()
+            .filter(entry -> entry.getValue() > 0)
+            .flatMap(buysEntry -> grenadeThrowsData.stream()
+                .filter(throwStat -> throwStat.getPlayer().equals(buysEntry.getKey()))
+                .map(throwStat -> {
+                    Integer throwsCount = Integer.valueOf(throwStat.getValue().toString());
+                    Integer wastes = buysEntry.getValue() - throwsCount;
+                    return Map.entry(buysEntry.getKey(), wastes);
+                })
+            )
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        // Setteando los valores desde el map anterior
+        TotalDataDTO leftOvers = new TotalDataDTO();
+        leftOvers.setIcon("/icons/total_data/grenades_no_use.png");
+        leftOvers.setShinchan(wastesMap.get(constants.PLAYER_SHINCHAN).toString());
+        leftOvers.setKazama(wastesMap.get(constants.PLAYER_KAZAMA).toString());
+        leftOvers.setMafios(wastesMap.get(constants.PLAYER_MAFIOS).toString());
+        leftOvers.setNene(wastesMap.get(constants.PLAYER_NENE).toString());
+        leftOvers.setSwagchan(wastesMap.get(constants.PLAYER_SWAGCHAN).toString());
+        leftOvers.setCustomOrder(29);
+        grenadesMap.put("Granadas no lanzadas", leftOvers);
 
         TotalDataDTO flashes = new TotalDataDTO();
         flashes.setIcon("/icons/total_data/flashes.png");
-        flashes.setShinchan(String.valueOf(totalGrenades.stream()
-            .filter(flash -> constants.PLAYER_SHINCHAN.equals(flash.getThrowerName()) && "Flashbang".equals(flash.getGrenadeName()))
-            .count()));
-        flashes.setKazama(String.valueOf(totalGrenades.stream()
-            .filter(flash -> constants.PLAYER_KAZAMA.equals(flash.getThrowerName()) && "Flashbang".equals(flash.getGrenadeName()))
-            .count()));
-        flashes.setMafios(String.valueOf(totalGrenades.stream()
-            .filter(flash -> constants.PLAYER_MAFIOS.equals(flash.getThrowerName()) && "Flashbang".equals(flash.getGrenadeName()))
-            .count()));
-        flashes.setNene(String.valueOf(totalGrenades.stream()
-            .filter(flash -> constants.PLAYER_NENE.equals(flash.getThrowerName()) && "Flashbang".equals(flash.getGrenadeName()))
-            .count()));
-        flashes.setSwagchan(String.valueOf(totalGrenades.stream()
-            .filter(flash -> constants.PLAYER_SWAGCHAN.equals(flash.getThrowerName()) && "Flashbang".equals(flash.getGrenadeName()))
-            .count()));
+        flashes.setShinchan(flashThrowsData.stream()
+            .filter(flash -> constants.PLAYER_SHINCHAN.equals(flash.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
+        flashes.setKazama(flashThrowsData.stream()
+            .filter(flash -> constants.PLAYER_KAZAMA.equals(flash.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
+        flashes.setMafios(flashThrowsData.stream()
+            .filter(flash -> constants.PLAYER_MAFIOS.equals(flash.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
+        flashes.setNene(flashThrowsData.stream()
+            .filter(flash -> constants.PLAYER_NENE.equals(flash.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
+        flashes.setSwagchan(flashThrowsData.stream()
+            .filter(flash -> constants.PLAYER_SWAGCHAN.equals(flash.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
         flashes.setCustomOrder(24);
         grenadesMap.put("Flashes lanzadas", flashes);
 
         TotalDataDTO smokes = new TotalDataDTO();
         smokes.setIcon("/icons/total_data/smokes.png");
-        smokes.setShinchan(String.valueOf(totalGrenades.stream()
-            .filter(smoke -> constants.PLAYER_SHINCHAN.equals(smoke.getThrowerName()) && "Smoke Grenade".equals(smoke.getGrenadeName()))
-            .count()));
-        smokes.setKazama(String.valueOf(totalGrenades.stream()
-            .filter(smoke -> constants.PLAYER_KAZAMA.equals(smoke.getThrowerName()) && "Smoke Grenade".equals(smoke.getGrenadeName()))
-            .count()));
-        smokes.setMafios(String.valueOf(totalGrenades.stream()
-            .filter(smoke -> constants.PLAYER_MAFIOS.equals(smoke.getThrowerName()) && "Smoke Grenade".equals(smoke.getGrenadeName()))
-            .count()));
-        smokes.setNene(String.valueOf(totalGrenades.stream()
-            .filter(smoke -> constants.PLAYER_NENE.equals(smoke.getThrowerName()) && "Smoke Grenade".equals(smoke.getGrenadeName()))
-            .count()));
-        smokes.setSwagchan(String.valueOf(totalGrenades.stream()
-            .filter(smoke -> constants.PLAYER_SWAGCHAN.equals(smoke.getThrowerName()) && "Smoke Grenade".equals(smoke.getGrenadeName()))
-            .count()));
+        smokes.setShinchan(smokeThrowsData.stream()
+            .filter(smoke -> constants.PLAYER_SHINCHAN.equals(smoke.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
+        smokes.setKazama(smokeThrowsData.stream()
+            .filter(smoke -> constants.PLAYER_KAZAMA.equals(smoke.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
+        smokes.setMafios(smokeThrowsData.stream()
+            .filter(smoke -> constants.PLAYER_MAFIOS.equals(smoke.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
+        smokes.setNene(smokeThrowsData.stream()
+            .filter(smoke -> constants.PLAYER_NENE.equals(smoke.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
+        smokes.setSwagchan(smokeThrowsData.stream()
+            .filter(smoke -> constants.PLAYER_SWAGCHAN.equals(smoke.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
         smokes.setCustomOrder(25);
         grenadesMap.put("Humos lanzados", smokes);
 
         TotalDataDTO hes = new TotalDataDTO();
         hes.setIcon("/icons/total_data/he_grenades.png");
-        hes.setShinchan(String.valueOf(totalGrenades.stream()
-            .filter(he -> constants.PLAYER_SHINCHAN.equals(he.getThrowerName()) && "HE Grenade".equals(he.getGrenadeName()))
-            .count()));
-        hes.setKazama(String.valueOf(totalGrenades.stream()
-            .filter(he -> constants.PLAYER_KAZAMA.equals(he.getThrowerName()) && "HE Grenade".equals(he.getGrenadeName()))
-            .count()));
-        hes.setMafios(String.valueOf(totalGrenades.stream()
-            .filter(he -> constants.PLAYER_MAFIOS.equals(he.getThrowerName()) && "HE Grenade".equals(he.getGrenadeName()))
-            .count()));
-        hes.setNene(String.valueOf(totalGrenades.stream()
-            .filter(he -> constants.PLAYER_NENE.equals(he.getThrowerName()) && "HE Grenade".equals(he.getGrenadeName()))
-            .count()));
-        hes.setSwagchan(String.valueOf(totalGrenades.stream()
-            .filter(he -> constants.PLAYER_SWAGCHAN.equals(he.getThrowerName()) && "HE Grenade".equals(he.getGrenadeName()))
-            .count()));
+        hes.setShinchan(heThrowsData.stream()
+            .filter(he -> constants.PLAYER_SHINCHAN.equals(he.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
+        hes.setKazama(heThrowsData.stream()
+            .filter(he -> constants.PLAYER_KAZAMA.equals(he.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
+        hes.setMafios(heThrowsData.stream()
+            .filter(he -> constants.PLAYER_MAFIOS.equals(he.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
+        hes.setNene(heThrowsData.stream()
+            .filter(he -> constants.PLAYER_NENE.equals(he.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
+        hes.setSwagchan(heThrowsData.stream()
+            .filter(he -> constants.PLAYER_SWAGCHAN.equals(he.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
         hes.setCustomOrder(26);
         grenadesMap.put("HEs lanzadas", hes);
 
         TotalDataDTO decoys = new TotalDataDTO();
         decoys.setIcon("/icons/total_data/decoys.png");
-        decoys.setShinchan(String.valueOf(totalGrenades.stream()
-            .filter(decoy -> constants.PLAYER_SHINCHAN.equals(decoy.getThrowerName()) && "Decoy Grenade".equals(decoy.getGrenadeName()))
-            .count()));
-        decoys.setKazama(String.valueOf(totalGrenades.stream()
-            .filter(decoy -> constants.PLAYER_KAZAMA.equals(decoy.getThrowerName()) && "Decoy Grenade".equals(decoy.getGrenadeName()))
-            .count()));
-        decoys.setMafios(String.valueOf(totalGrenades.stream()
-            .filter(decoy -> constants.PLAYER_MAFIOS.equals(decoy.getThrowerName()) && "Decoy Grenade".equals(decoy.getGrenadeName()))
-            .count()));
-        decoys.setNene(String.valueOf(totalGrenades.stream()
-            .filter(decoy -> constants.PLAYER_NENE.equals(decoy.getThrowerName()) && "Decoy Grenade".equals(decoy.getGrenadeName()))
-            .count()));
-        decoys.setSwagchan(String.valueOf(totalGrenades.stream()
-            .filter(decoy -> constants.PLAYER_SWAGCHAN.equals(decoy.getThrowerName()) && "Decoy Grenade".equals(decoy.getGrenadeName()))
-            .count()));
+        decoys.setShinchan(decoyThrowsData.stream()
+            .filter(decoy -> constants.PLAYER_SHINCHAN.equals(decoy.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
+        decoys.setKazama(decoyThrowsData.stream()
+            .filter(decoy -> constants.PLAYER_KAZAMA.equals(decoy.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
+        decoys.setMafios(decoyThrowsData.stream()
+            .filter(decoy -> constants.PLAYER_MAFIOS.equals(decoy.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
+        decoys.setNene(decoyThrowsData.stream()
+            .filter(decoy -> constants.PLAYER_NENE.equals(decoy.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
+        decoys.setSwagchan(decoyThrowsData.stream()
+            .filter(decoy -> constants.PLAYER_SWAGCHAN.equals(decoy.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
         decoys.setCustomOrder(27);
         grenadesMap.put("Decoys lanzadas", decoys);
 
         TotalDataDTO molotovs = new TotalDataDTO();
         molotovs.setIcon("/icons/total_data/molotovs.png");
-        molotovs.setShinchan(String.valueOf(totalGrenades.stream()
-            .filter(molotov -> constants.PLAYER_SHINCHAN.equals(molotov.getThrowerName()) && Arrays.asList("Molotov","Incendiary Grenade").contains(molotov.getGrenadeName()))
-            .count()));
-        molotovs.setKazama(String.valueOf(totalGrenades.stream()
-            .filter(molotov -> constants.PLAYER_KAZAMA.equals(molotov.getThrowerName()) && Arrays.asList("Molotov","Incendiary Grenade").contains(molotov.getGrenadeName()))
-            .count()));
-        molotovs.setMafios(String.valueOf(totalGrenades.stream()
-            .filter(molotov -> constants.PLAYER_MAFIOS.equals(molotov.getThrowerName()) && Arrays.asList("Molotov","Incendiary Grenade").contains(molotov.getGrenadeName()))
-            .count()));
-        molotovs.setNene(String.valueOf(totalGrenades.stream()
-            .filter(molotov -> constants.PLAYER_NENE.equals(molotov.getThrowerName()) && Arrays.asList("Molotov","Incendiary Grenade").contains(molotov.getGrenadeName()))
-            .count()));
-        molotovs.setSwagchan(String.valueOf(totalGrenades.stream()
-            .filter(molotov -> constants.PLAYER_SWAGCHAN.equals(molotov.getThrowerName()) && Arrays.asList("Molotov","Incendiary Grenade").contains(molotov.getGrenadeName()))
-            .count()));
+        molotovs.setShinchan(molotovThrowsData.stream()
+            .filter(molotov -> constants.PLAYER_SHINCHAN.equals(molotov.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
+        molotovs.setKazama(molotovThrowsData.stream()
+            .filter(molotov -> constants.PLAYER_KAZAMA.equals(molotov.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
+        molotovs.setMafios(molotovThrowsData.stream()
+            .filter(molotov -> constants.PLAYER_MAFIOS.equals(molotov.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
+        molotovs.setNene(molotovThrowsData.stream()
+            .filter(molotov -> constants.PLAYER_NENE.equals(molotov.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
+        molotovs.setSwagchan(molotovThrowsData.stream()
+            .filter(molotov -> constants.PLAYER_SWAGCHAN.equals(molotov.getPlayer()))
+            .findFirst().map(StatisticDTO::getValue).orElse("0").toString());
         molotovs.setCustomOrder(28);
         grenadesMap.put("Molotovs lanzados", molotovs);
-
-        TotalDataDTO leftOvers = new TotalDataDTO();
-        leftOvers.setIcon("/icons/total_data/grenades_no_use.png");
-        Integer buyedGrenades = 0;
-        Integer throwedGrenades = 0;
-
-        buyedGrenades = (int) (grenadeBuys.stream().filter(leftOver -> constants.PLAYER_SHINCHAN.equals(leftOver.getPlayerName())).count());
-        throwedGrenades = (int) (totalGrenades.stream().filter(grenade -> constants.PLAYER_SHINCHAN.equals(grenade.getThrowerName())).count());
-        leftOvers.setShinchan(String.valueOf(buyedGrenades - throwedGrenades));
-        
-        buyedGrenades = (int) (grenadeBuys.stream().filter(leftOver -> constants.PLAYER_KAZAMA.equals(leftOver.getPlayerName())).count());
-        throwedGrenades = (int) (totalGrenades.stream().filter(grenade -> constants.PLAYER_KAZAMA.equals(grenade.getThrowerName())).count());
-        leftOvers.setKazama(String.valueOf(buyedGrenades - throwedGrenades));
-
-        buyedGrenades = (int) (grenadeBuys.stream().filter(leftOver -> constants.PLAYER_MAFIOS.equals(leftOver.getPlayerName())).count());
-        throwedGrenades = (int) (totalGrenades.stream().filter(grenade -> constants.PLAYER_MAFIOS.equals(grenade.getThrowerName())).count());
-        leftOvers.setMafios(String.valueOf(buyedGrenades - throwedGrenades));
-
-        buyedGrenades = (int) (grenadeBuys.stream().filter(leftOver -> constants.PLAYER_NENE.equals(leftOver.getPlayerName())).count());
-        throwedGrenades = (int) (totalGrenades.stream().filter(grenade -> constants.PLAYER_NENE.equals(grenade.getThrowerName())).count());
-        leftOvers.setNene(String.valueOf(buyedGrenades - throwedGrenades));
-
-        buyedGrenades = (int) (grenadeBuys.stream().filter(leftOver -> constants.PLAYER_SWAGCHAN.equals(leftOver.getPlayerName())).count());
-        throwedGrenades = (int) (totalGrenades.stream().filter(grenade -> constants.PLAYER_SWAGCHAN.equals(grenade.getThrowerName())).count());
-        leftOvers.setSwagchan(String.valueOf(buyedGrenades - throwedGrenades));
-
-        leftOvers.setCustomOrder(29);
-        grenadesMap.put("Granadas no lanzadas", leftOvers);
 
         return grenadesMap;
     }

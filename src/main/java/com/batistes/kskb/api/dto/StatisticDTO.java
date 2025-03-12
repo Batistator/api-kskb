@@ -5,17 +5,20 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
 public class StatisticDTO {
     private static final Logger logger = LoggerFactory.getLogger(FullTitleDTO.class);
 
     private String player;
     
     private Object value;
+
+    public StatisticDTO(String player, Object value) {
+        this.player = player;
+        this.value = value;
+    }
 
     @Override
     public String toString() {

@@ -25,10 +25,10 @@ public class Damages {
     private Integer frame;
 
     @Column(nullable = false)
-    private String healthDamage;
+    private Integer healthDamage;
 
     @Column(nullable = false)
-    private String armorDamage;
+    private Integer armorDamage;
 
     @Column(nullable = false)
     private Integer victimHealth;
