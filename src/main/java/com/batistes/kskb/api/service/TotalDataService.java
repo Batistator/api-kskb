@@ -907,7 +907,7 @@ public class TotalDataService {
             .filter(kill -> constants.PLAYER_SHINCHAN.equals(kill.getAssisterName()))
             .count()));
         kills.setKazama(String.valueOf(totalKills.stream()
-            .filter(kill -> constants.PLAYER_KAZAMA.equals(kill.getKillerName()))
+            .filter(kill -> constants.PLAYER_KAZAMA.equals(kill.getAssisterName()))
             .count()));        
         kills.setMafios(String.valueOf(totalKills.stream()
             .filter(kill -> constants.PLAYER_MAFIOS.equals(kill.getAssisterName()))
