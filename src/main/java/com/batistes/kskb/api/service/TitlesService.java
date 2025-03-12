@@ -943,8 +943,8 @@ public class TitlesService {
         //  Título de menos tiros
         titlesList.add(shots.stream()
         .min((s1, s2) -> Integer.compare(Integer.valueOf(s1.getValue().toString()), Integer.valueOf(s2.getValue().toString())))
-        .map(stat -> buildTitle("mostshots", stat.getPlayer(), String.format("%,d", Integer.valueOf(stat.getValue().toString()))))
-        .orElse(buildTitle("mostshots","-","-")));
+        .map(stat -> buildTitle("lessshots", stat.getPlayer(), String.format("%,d", Integer.valueOf(stat.getValue().toString()))))
+        .orElse(buildTitle("lessshots","-","-")));
 
         return titlesList;
     }
