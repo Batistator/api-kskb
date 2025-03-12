@@ -223,6 +223,28 @@ public class TotalDataService {
         //Convertimos el LIST en un STRING JSON
         String result = Utils.convertToJSON(totalDataList);
 
+        // Liberar referencias a las listas
+        logger.info("Liberando memoria");
+        players = null;
+        kills = null;
+        bombsDefused = null;
+        bombsPlanted = null;
+        playerEconomies = null;
+        shotsData = null;
+        chickenDeaths = null;
+        playerBlinds = null;
+        damagesData = null;
+        grenadeBouncesData = null;
+        playerGrenadeBuysData = null;
+        grenadeThrowsData = null;
+        heThrowsData = null;
+        smokeThrowsData = null;
+        molotovThrowsData = null;
+        decoyThrowsData = null;
+        flashThrowsData = null;
+        allyDamagesData = null;
+        selfDamagesData = null;
+
         return result;
     }
 
