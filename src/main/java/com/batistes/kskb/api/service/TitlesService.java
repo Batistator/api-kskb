@@ -215,6 +215,10 @@ public class TitlesService {
 
         titlesList.addAll(processKills(kills, rounds));
         logger.info("Kills Processing Finished");
+        titlesList.addAll(processFastestKill(fastestKillData));
+        logger.info("FastestKill Processing Finished");
+        titlesList.addAll(processFastestDeath(fastestDeathData));
+        logger.info("FastestDeath Processing Finished");
         titlesList.addAll(processPlayers(players));
         logger.info("Players Processing Finished");
         titlesList.addAll(processGrenades(grenades));
@@ -245,10 +249,7 @@ public class TitlesService {
         logger.info("Wastes Processing Finished");
         titlesList.addAll(processBounces(grenadeBouncesData));
         logger.info("Bounces Processing Finished");
-        titlesList.addAll(processFastestKill(fastestKillData));
-        logger.info("FastestKill Processing Finished");
-        titlesList.addAll(processFastestDeath(fastestDeathData));
-        logger.info("FastestDeath Processing Finished");
+       
 
         logger.info("Java process Finished");
 
@@ -941,7 +942,7 @@ public class TitlesService {
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
 
         //  Título de la eliminación más rápida
-        titlesList.add(formatTitle("fastestkill", fastestDeathData.getPlayer(), String.format("%.2f", Double.valueOf(fastestDeathData.getValue().toString())/64)));
+        titlesList.add(formatTitle("fastestdeath", fastestDeathData.getPlayer(), String.format("%.2f", Double.valueOf(fastestDeathData.getValue().toString())/64)));
 
         return titlesList;
 }
