@@ -110,119 +110,150 @@ public class TitlesService {
     public List<FullTitleDTO> findAllTitles(Date startDate, Date endDate){
         
         logger.info("Data retrieve start");
+
         List<Players> players = playersRepository.findByNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
+        logger.info("SQL - Players data Finished");
 
-        logger.info("Players data Finished");
         List<Kills> kills = killsRepository.findByKillerNameOrAssisterNameOrVictimNameBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
+        logger.info("SQL - Kills data Finished");
 
-        logger.info("Kills data Finished");        
         List<BombsDefused> bombsDefused = bombsDefusedRepository.findByDefuserNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
-        
-        logger.info("Bombs defused data Finished");     
+        logger.info("SQL - Bombs defused data Finished");
+
         List<BombsPlanted> bombsPlanted = bombsPlantedRepository.findByPlanterNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
-        
-        logger.info("Bombs planted start data Finished");
+        logger.info("SQL - Bombs planted start data Finished");
+
         List<BombsDefuseStart> bombsDefuseStart = bombsDefuseStartRepository.findByDefuserNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
-        
-        logger.info("Bombs defused start data Finished");     
+        logger.info("SQL - Bombs defused start data Finished");
+
         List<BombsPlantStart> bombsPlantStart = bombsPlantStartRepository.findByPlanterNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
-        
-        logger.info("Bombs planted data Finished");
+        logger.info("SQL - Bombs planted data Finished");
+
         List<GrenadeProjectilesDestroy> grenades = grenadeProjectilesDestroyRepository.findByThrowerNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
-        
-        logger.info("Grenade projectile destroy data Finished");
+        logger.info("SQL - Grenade projectile destroy data Finished");
+
         List<PlayerEconomies> playerEconomies = playerEconomiesRepository.findByPlayerNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
-  
-        logger.info("Player economies data Finished");  
+        logger.info("SQL - Player economies data Finished");
         
         List<ChickenDeaths> chickenDeaths = chickenDeathsRepository.findByKillerSteamIdInBetweenDates(
             Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID),
             startDate, endDate);
-        
-        logger.info("Chicken deaths data Finished");        
+        logger.info("SQL - Chicken deaths data Finished");
+
         List<PlayerBlinds> playerBlinds = playerBlindsRepository.findByKillerNameOrAssisterNameOrVictimNameBetweenDates(
             Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID),
             startDate, endDate);
-        
-        logger.info("Player blinds data Finished");
+        logger.info("SQL - Player blinds data Finished");
 
         List<Clutches> clutches = clutchesRepository.findByClutcherNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
            startDate, endDate);
-        logger.info("Player buys data Finished");
+        logger.info("SQL - Player buys data Finished");
 
         List<Rounds> rounds = roundsRepository.findAll();
-        logger.info("Rounds data Finished");
+        logger.info("SQL - Rounds data Finished");
 
         List<StatisticDTO> shotsData = shotsRepository.countShotsByPlayerNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
-        logger.info("Shots data Finished");
+        logger.info("SQL - Shots data Finished");
 
         List<StatisticDTO> damagesData = damagesRepository.countDamagesByAttackerSteamIdInBetweenDates(
             Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID),
             startDate, endDate);
-        logger.info("Damages data Finished");
+        logger.info("SQL - Damages data Finished");
 
         List<StatisticDTO> playerRefundsData = playerBuysRepository.findRefundsByPlayerNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
-        logger.info("Player Refunds data Finished");
+        logger.info("SQL - Player Refunds data Finished");
 
         List<StatisticDTO> playerGrenadeBuysData = playerBuysRepository.findGrenadeBuysByPlayerNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
-        logger.info("Player Grenade Buys data Finished");
+        logger.info("SQL - Player Grenade Buys data Finished");
 
         List<StatisticDTO> grenadeThrowsData = grenadeProjectilesDestroyRepository.countGrenadesByThrowerNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
-        logger.info("Player Grenade Throws data Finished");
+        logger.info("SQL - Player Grenade Throws data Finished");
 
         List<StatisticDTO> grenadeBouncesData = grenadeBouncesRepository.countBouncesByPlayerNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
-        logger.info("Grenade Bounces data Finished");
+        logger.info("SQL - Grenade Bounces data Finished");
+
+        StatisticDTO fastestKillData = killsRepository.findFastestKillTitle(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            startDate, endDate);
+        logger.info("SQL - Fastest kill data Finished");
+
+        StatisticDTO fastestDeathData = killsRepository.findFastestDeathTitle(
+            Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
+            startDate, endDate);
+        logger.info("SQL - Fastest death data Finished");
         
         logger.info("SQL Finished");
 
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
 
-        titlesList.addAll(filterKills(kills, rounds));
-        titlesList.addAll(filterPlayers(players));
-        titlesList.addAll(filterGrenades(grenades));
-        titlesList.addAll(filterPrecision(shotsData, damagesData));
-        titlesList.addAll(filterClutches(clutches));
-        titlesList.addAll(filterBlinds(playerBlinds));
-        titlesList.addAll(filterPlants(bombsPlanted));
-        titlesList.addAll(filterDefuses(bombsDefused));
-        titlesList.addAll(filterFakePlants(bombsPlanted,bombsPlantStart));
-        titlesList.addAll(filterFakeDefuse(bombsDefused,bombsDefuseStart));
-        titlesList.addAll(filterChicken(chickenDeaths));
-        titlesList.addAll(filterRefunds(playerRefundsData));
-        titlesList.addAll(filterPlayerEconomies(playerEconomies));
-        titlesList.addAll(filterShots(shotsData));
-        titlesList.addAll(filterWastes(playerGrenadeBuysData,grenadeThrowsData));
-        titlesList.addAll(filterBounces(grenadeBouncesData));
+        titlesList.addAll(processKills(kills, rounds));
+        logger.info("Kills Processing Finished");
+        titlesList.addAll(processPlayers(players));
+        logger.info("Players Processing Finished");
+        titlesList.addAll(processGrenades(grenades));
+        logger.info("Grenades Processing Finished");
+        titlesList.addAll(processPrecision(shotsData, damagesData));
+        logger.info("Precision Processing Finished");
+        titlesList.addAll(processClutches(clutches));
+        logger.info("Clutches Processing Finished");
+        titlesList.addAll(processBlinds(playerBlinds));
+        logger.info("Blinds Processing Finished");
+        titlesList.addAll(processPlants(bombsPlanted));
+        logger.info("Plants Processing Finished");
+        titlesList.addAll(processDefuses(bombsDefused));
+        logger.info("Defuses Processing Finished");
+        titlesList.addAll(processFakePlants(bombsPlanted,bombsPlantStart));
+        logger.info("FakePlants Processing Finished");
+        titlesList.addAll(processFakeDefuse(bombsDefused,bombsDefuseStart));
+        logger.info("FakeDefuse Processing Finished");
+        titlesList.addAll(processChicken(chickenDeaths));
+        logger.info("Chicken Processing Finished");
+        titlesList.addAll(processRefunds(playerRefundsData));
+        logger.info("Refunds Processing Finished");
+        titlesList.addAll(processPlayerEconomies(playerEconomies));
+        logger.info("PlayerEconomies Processing Finished");
+        titlesList.addAll(processShots(shotsData));
+        logger.info("Shots Processing Finished");
+        titlesList.addAll(processWastes(playerGrenadeBuysData,grenadeThrowsData));
+        logger.info("Wastes Processing Finished");
+        titlesList.addAll(processBounces(grenadeBouncesData));
+        logger.info("Bounces Processing Finished");
+        titlesList.addAll(processFastestKill(fastestKillData));
+        logger.info("FastestKill Processing Finished");
+        titlesList.addAll(processFastestDeath(fastestDeathData));
+        logger.info("FastestDeath Processing Finished");
+
+        logger.info("Java process Finished");
 
         // Liberar referencias a las listas
-        logger.info("Liberando memoria");
+        logger.info("Memory freeing");
         players = null;
         kills = null;
         bombsDefused = null;
@@ -241,22 +272,13 @@ public class TitlesService {
         rounds = null;
         playerGrenadeBuysData = null;
         grenadeThrowsData = null;
+        fastestKillData = null;
+        fastestDeathData = null;
 
         return titlesList;
     }
 
-    private FullTitleDTO buildTitle(String titleCode, String player, Object value){
-        return FullTitleDTO.builder()
-            .title(titles.getTitlesMap().get(titleCode).getTitle())
-            .description(titles.getTitlesMap().get(titleCode).getDescription())
-            .player(player)
-            .icon(titles.getTitlesMap().get(titleCode).getIcon())
-            .valueString(value.equals("-")?"-":
-                (value.toString() + " " + titles.getTitlesMap().get(titleCode).getUnit()))
-            .build();
-    }
-
-    private List<FullTitleDTO> filterKills (List<Kills> kills, List<Rounds> rounds){
+    private List<FullTitleDTO> processKills (List<Kills> kills, List<Rounds> rounds){
 
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
 
@@ -269,8 +291,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostkills",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostkills","-","-")));
+            .map(entry -> formatTitle("mostkills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostkills","-","-")));
 
         //  Título de más muertes
         titlesList.add(kills.stream()
@@ -280,8 +302,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostdeaths",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostdeaths","-","-")));
+            .map(entry -> formatTitle("mostdeaths",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostdeaths","-","-")));
 
         //  Título de más asistencias
         titlesList.add(kills.stream()
@@ -292,8 +314,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostassists",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostassists","-","-")));
+            .map(entry -> formatTitle("mostassists",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostassists","-","-")));
 
         //  Título de menos muertes
         titlesList.add(kills.stream()
@@ -303,8 +325,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .min(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("lessdeaths",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("lessdeaths","-","-")));
+            .map(entry -> formatTitle("lessdeaths",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("lessdeaths","-","-")));
 
         //  Título de porcentaje de tiros en la cabeza
         titlesList.add(kills.stream()
@@ -320,34 +342,8 @@ public class TitlesService {
                 return Map.entry(entry.getKey(), headshotPercentage);
             })
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostheadshots",entry.getKey(),String.format("%.2f", entry.getValue())))
-            .orElse(buildTitle("mostheadshots","-","-")));
-
-        //  Título de eliminación más rápida
-        titlesList.add(kills.stream()
-            .filter(kill -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
-                .contains(kill.getKillerName()))
-            .filter(kill -> !Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
-                .contains(kill.getVictimName()))
-            .flatMap(kill -> rounds.stream()
-                .filter(round -> round.getMatchChecksum().equals(kill.getMatchChecksum()) && round.getNumber() == kill.getRoundNumber())
-                .map(round -> Map.entry(kill.getKillerName(), (double) (kill.getTick() - round.getFreezeTimeEndTick()))))
-            .min(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("fastestkill",entry.getKey(),String.format("%.2f", entry.getValue() / 64)))
-            .orElse(buildTitle("fastestkill","-","-")));
-
-        //  Título de muerte más rápida
-        titlesList.add(kills.stream()
-            .filter(kill -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
-                .contains(kill.getVictimName()))
-            .filter(kill -> !Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
-                .contains(kill.getKillerName()))
-            .flatMap(kill -> rounds.stream()
-                .filter(round -> round.getMatchChecksum().equals(kill.getMatchChecksum()) && round.getNumber() == kill.getRoundNumber())
-                .map(round -> Map.entry(kill.getVictimName(), (double) (kill.getTick() - round.getFreezeTimeEndTick()))))
-            .min(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("fastestdeath",entry.getKey(),String.format("%.2f", entry.getValue() / 64)))
-            .orElse(buildTitle("fastestdeath","-","-")));
+            .map(entry -> formatTitle("mostheadshots",entry.getKey(),String.format("%.2f", entry.getValue())))
+            .orElse(formatTitle("mostheadshots","-","-")));
 
         //  Título de más muertes por C4
         titlesList.add(kills.stream()
@@ -358,8 +354,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostc4deaths",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostc4deaths","-","-")));
+            .map(entry -> formatTitle("mostc4deaths",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostc4deaths","-","-")));
 
         //  Título de más team kills
         titlesList.add(kills.stream()
@@ -372,8 +368,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostteamkills",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostteamkills","-","-")));
+            .map(entry -> formatTitle("mostteamkills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostteamkills","-","-")));
 
         //  Título de más eliminaciones con granada
         titlesList.add(kills.stream()
@@ -384,8 +380,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mosthekills",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mosthekills","-","-")));
+            .map(entry -> formatTitle("mosthekills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mosthekills","-","-")));
 
         //  Título de más eliminaciones con fuego
         titlesList.add(kills.stream()
@@ -396,8 +392,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostfirekills",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostfirekills","-","-")));
+            .map(entry -> formatTitle("mostfirekills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostfirekills","-","-")));
 
         //  Título de más eliminaciones con cuchillo
         titlesList.add(kills.stream()
@@ -408,8 +404,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostknifekills",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostknifekills","-","-")));
+            .map(entry -> formatTitle("mostknifekills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostknifekills","-","-")));
 
         //  Título de más eliminaciones con taser
         titlesList.add(kills.stream()
@@ -420,8 +416,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mosttaserkills",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mosttaserkills","-","-")));
+            .map(entry -> formatTitle("mosttaserkills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mosttaserkills","-","-")));
 
         //  Título de más eliminaciones con escopeta
         titlesList.add(kills.stream()
@@ -432,16 +428,16 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostshotgunkills",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostshotgunkills","-","-")));
-            
+            .map(entry -> formatTitle("mostshotgunkills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostshotgunkills","-","-")));
+
         //  Título de la eliminación desde más lejos
         titlesList.add(kills.stream()
             .filter(kill -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
                 .contains(kill.getKillerName()))
             .max((kill1, kill2) -> Double.compare(kill1.getDistance(), kill2.getDistance()))
-            .map(kill -> buildTitle("mostdistancekill",kill.getKillerName(),String.format("%.2f", kill.getDistance())))
-            .orElse(buildTitle("mostshotgunkills","-","-")));
+            .map(kill -> formatTitle("mostdistancekill",kill.getKillerName(),String.format("%.2f", kill.getDistance())))
+            .orElse(formatTitle("mostdistancekill","-","-")));
 
         //  Título de más trade kills
         titlesList.add(kills.stream()
@@ -452,8 +448,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mosttradekills",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mosttradekills","-","-")));
+            .map(entry -> formatTitle("mosttradekills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mosttradekills","-","-")));
 
         //  Título de más trade deaths
         titlesList.add(kills.stream()
@@ -464,9 +460,9 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mosttradedeaths",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mosttradedeaths","-","-")));
-            
+            .map(entry -> formatTitle("mosttradedeaths",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mosttradedeaths","-","-")));
+
         //  Título de más eliminaciones saltando
         titlesList.add(kills.stream()
             .filter(kill -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
@@ -476,8 +472,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostairkills",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostairkills","-","-")));
+            .map(entry -> formatTitle("mostairkills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostairkills","-","-")));
 
         //  Título de más eliminaciones atravesando
         titlesList.add(kills.stream()
@@ -488,8 +484,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostthroughkills",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostthroughkills","-","-")));
+            .map(entry -> formatTitle("mostthroughkills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostthroughkills","-","-")));
 
         //  Título de más eliminaciones traspasando humo
         titlesList.add(kills.stream()
@@ -500,8 +496,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostsmokekills",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostsmokekills","-","-")));
+            .map(entry -> formatTitle("mostsmokekills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostsmokekills","-","-")));
 
         //  Título de más eliminaciones no scope
         titlesList.add(kills.stream()
@@ -512,8 +508,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostnoscope",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostnoscope","-","-")));
+            .map(entry -> formatTitle("mostnoscope",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostnoscope","-","-")));
 
         //  Título de más asistencias con flash
         titlesList.add(kills.stream()
@@ -524,8 +520,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostflashassists",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostflashassists","-","-")));
+            .map(entry -> formatTitle("mostflashassists",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostflashassists","-","-")));
 
         //  Título de más eliminaciones ciego
         titlesList.add(kills.stream()
@@ -536,13 +532,13 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostblindkills",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostblindkills","-","-")));
+            .map(entry -> formatTitle("mostblindkills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostblindkills","-","-")));
 
         return titlesList;
     }
 
-    private List<FullTitleDTO> filterPlayers (List<Players> players){
+    private List<FullTitleDTO> processPlayers (List<Players> players){
 
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
 
@@ -554,8 +550,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("most5k",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("most5k","-","-")));
+            .map(entry -> formatTitle("most5k",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("most5k","-","-")));
 
         //  Título de más 4K
         titlesList.add(players.stream()
@@ -565,8 +561,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("most4k",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("most4k","-","-")));
+            .map(entry -> formatTitle("most4k",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("most4k","-","-")));
 
         //  Título de más 3K
         titlesList.add(players.stream()
@@ -576,8 +572,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("most3k",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("most3k","-","-")));
+            .map(entry -> formatTitle("most3k",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("most3k","-","-")));
                     
         //  Título de más 2K
         titlesList.add(players.stream()
@@ -587,8 +583,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("most2k",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("most2k","-","-")));
+            .map(entry -> formatTitle("most2k",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("most2k","-","-")));
             
         //  Título de más 1K
         titlesList.add(players.stream()
@@ -598,8 +594,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("most1k",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("most1k","-","-")));
+            .map(entry -> formatTitle("most1k",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("most1k","-","-")));
 
         //  Título de más MVP
         titlesList.add(players.stream()
@@ -609,8 +605,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostmvp",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostmvp","-","-")));
+            .map(entry -> formatTitle("mostmvp",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostmvp","-","-")));
 
         //  Título de más daño diverso
         titlesList.add(players.stream()
@@ -620,8 +616,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostdd",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostdd","-","-")));
+            .map(entry -> formatTitle("mostdd",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostdd","-","-")));
 
         // Título de más Anti-shinchan
         titlesList.add(players.stream()
@@ -638,8 +634,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostovershinchan",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostovershinchan","-","-")));
+            .map(entry -> formatTitle("mostovershinchan",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostovershinchan","-","-")));
 
         //  Título de más entry kills
         titlesList.add(players.stream()
@@ -649,13 +645,13 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostentrykills",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostentrykills","-","-")));
+            .map(entry -> formatTitle("mostentrykills",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostentrykills","-","-")));
 
         return titlesList;
     }
 
-    private List<FullTitleDTO> filterPrecision (List<StatisticDTO> shotsData, List<StatisticDTO> damagesData){
+    private List<FullTitleDTO> processPrecision (List<StatisticDTO> shotsData, List<StatisticDTO> damagesData){
 
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
         
@@ -681,13 +677,13 @@ public class TitlesService {
         titlesList.add(precisionMap.entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostprecision",entry.getKey(),String.format("%.2f", entry.getValue())))
-            .orElse(buildTitle("mostprecision","-","-")));
+            .map(entry -> formatTitle("mostprecision",entry.getKey(),String.format("%.2f", entry.getValue())))
+            .orElse(formatTitle("mostprecision","-","-")));
 
         return titlesList;
     }
 
-    private List<FullTitleDTO> filterGrenades (List<GrenadeProjectilesDestroy> grenades){
+    private List<FullTitleDTO> processGrenades (List<GrenadeProjectilesDestroy> grenades){
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
 
         //  Título de más granadas tiradas
@@ -699,8 +695,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mosthe",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mosthe","-","-")));
+            .map(entry -> formatTitle("mosthe",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mosthe","-","-")));
 
         //  Título de más decoys tiradas
         titlesList.add(grenades.stream()
@@ -711,8 +707,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostdecoy",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostdecoy","-","-")));
+            .map(entry -> formatTitle("mostdecoy",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostdecoy","-","-")));
 
         //  Título de más flashes tiradas
         titlesList.add(grenades.stream()
@@ -723,8 +719,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostflash",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostflash","-","-")));
+            .map(entry -> formatTitle("mostflash",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostflash","-","-")));
 
         //  Título de más humos tirados
         titlesList.add(grenades.stream()
@@ -735,8 +731,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostsmoke",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostsmoke","-","-")));
+            .map(entry -> formatTitle("mostsmoke",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostsmoke","-","-")));
 
         //  Título de más fuegos tirados
         titlesList.add(grenades.stream()
@@ -747,13 +743,13 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostfire",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostfire","-","-")));
+            .map(entry -> formatTitle("mostfire",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostfire","-","-")));
 
         return titlesList;
     }
 
-    private List<FullTitleDTO> filterClutches (List<Clutches> clutches){
+    private List<FullTitleDTO> processClutches (List<Clutches> clutches){
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
 
         //  Título de más clutches ganados
@@ -765,13 +761,13 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostclutches",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostclutches","-","-")));
+            .map(entry -> formatTitle("mostclutches",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostclutches","-","-")));
 
         return titlesList;
     }
 
-    private List<FullTitleDTO> filterBlinds (List<PlayerBlinds> playerBlinds){
+    private List<FullTitleDTO> processBlinds (List<PlayerBlinds> playerBlinds){
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
 
         //  Título de la flash más duradera
@@ -779,13 +775,13 @@ public class TitlesService {
             .filter(playerBlind -> Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN)
                 .contains(playerBlind.getFlasherName()))
             .max((playerBlind1, playerBlind2) -> Double.compare(playerBlind1.getDuration(), playerBlind2.getDuration()))
-            .map(playerBlind -> buildTitle("longestflash",playerBlind.getFlasherName(),String.format("%.2f", playerBlind.getDuration())))
-            .orElse(buildTitle("longestflash","-","-")));
+            .map(playerBlind -> formatTitle("longestflash",playerBlind.getFlasherName(),String.format("%.2f", playerBlind.getDuration())))
+            .orElse(formatTitle("longestflash","-","-")));
 
         return titlesList;
     }
 
-    private List<FullTitleDTO> filterDefuses (List<BombsDefused> bombsDefuseds){
+    private List<FullTitleDTO> processDefuses (List<BombsDefused> bombsDefuseds){
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
 
         //  Título de más defuses
@@ -796,13 +792,13 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostdefuses",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostdefuses","-","-")));
+            .map(entry -> formatTitle("mostdefuses",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostdefuses","-","-")));
 
         return titlesList;
     }
 
-    private List<FullTitleDTO> filterPlants (List<BombsPlanted> bombsPlanteds){
+    private List<FullTitleDTO> processPlants (List<BombsPlanted> bombsPlanteds){
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
 
         //  Título de más plants
@@ -813,13 +809,13 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostplants",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostplants","-","-")));
+            .map(entry -> formatTitle("mostplants",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostplants","-","-")));
 
         return titlesList;
     }
 
-    private List<FullTitleDTO> filterFakePlants (List<BombsPlanted> bombsPlanteds, List<BombsPlantStart> bombsPlantStart){
+    private List<FullTitleDTO> processFakePlants (List<BombsPlanted> bombsPlanteds, List<BombsPlantStart> bombsPlantStart){
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
 
         //  Título de más fakes al plantar
@@ -839,13 +835,13 @@ public class TitlesService {
             return Map.entry(playerName, fakePlants);
             })
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostfakeplant",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostfakeplant","-","-")));
+            .map(entry -> formatTitle("mostfakeplant",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostfakeplant","-","-")));
 
         return titlesList;
     }
 
-    private List<FullTitleDTO> filterFakeDefuse (List<BombsDefused> bombsDefused, List<BombsDefuseStart> bombsDefusedStart){
+    private List<FullTitleDTO> processFakeDefuse (List<BombsDefused> bombsDefused, List<BombsDefuseStart> bombsDefusedStart){
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
 
         //  Título de más fakes al defusar
@@ -865,13 +861,13 @@ public class TitlesService {
             return Map.entry(playerName, fakeDefuse);
             })
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostfakedefuse",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostfakedefuse","-","-")));
+            .map(entry -> formatTitle("mostfakedefuse",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostfakedefuse","-","-")));
 
         return titlesList;
     }
 
-    private List<FullTitleDTO> filterChicken (List<ChickenDeaths> chickenDeaths){
+    private List<FullTitleDTO> processChicken (List<ChickenDeaths> chickenDeaths){
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
 
         //  Título de más pollos asesinados
@@ -882,13 +878,13 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostchicken",utils.convertSteamIdToName(entry.getKey()),entry.getValue()))
-            .orElse(buildTitle("mostchicken","-","-")));
+            .map(entry -> formatTitle("mostchicken",utils.convertSteamIdToName(entry.getKey()),entry.getValue()))
+            .orElse(formatTitle("mostchicken","-","-")));
 
         return titlesList;
     }
 
-    private List<FullTitleDTO> filterPlayerEconomies (List<PlayerEconomies> playerEconomies){
+    private List<FullTitleDTO> processPlayerEconomies (List<PlayerEconomies> playerEconomies){
 
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
 
@@ -900,8 +896,8 @@ public class TitlesService {
             .entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostspent",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("mostspent","-","-")));
+            .map(entry -> formatTitle("mostspent",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("mostspent","-","-")));
 
         //  Título de menos dinero gastado
         titlesList.add(playerEconomies.stream()
@@ -911,58 +907,78 @@ public class TitlesService {
             .entrySet()
             .stream()
             .min(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("lessspent",entry.getKey(),String.format("%,d",entry.getValue())))
-            .orElse(buildTitle("lessspent","-","-")));
+            .map(entry -> formatTitle("lessspent",entry.getKey(),String.format("%,d",entry.getValue())))
+            .orElse(formatTitle("lessspent","-","-")));
 
         return titlesList;
     }
 
-    private List<FullTitleDTO> filterRefunds (List<StatisticDTO> playerRefundsData){
+    private List<FullTitleDTO> processRefunds (List<StatisticDTO> playerRefundsData){
 
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
 
         //  Título de más devoluciones
         titlesList.add(playerRefundsData.stream()
         .max((r1, r2) -> Integer.compare(Integer.valueOf(r1.getValue().toString()), Integer.valueOf(r2.getValue().toString())))
-        .map(stat -> buildTitle("mostrefunds", stat.getPlayer(), String.format("%,d", Integer.valueOf(stat.getValue().toString()))))
-        .orElse(buildTitle("mostrefunds","-","-")));
+        .map(stat -> formatTitle("mostrefunds", stat.getPlayer(), String.format("%,d", Integer.valueOf(stat.getValue().toString()))))
+        .orElse(formatTitle("mostrefunds","-","-")));
 
         return titlesList;
     }
 
-    private List<FullTitleDTO> filterShots (List<StatisticDTO> shots){
+    private List<FullTitleDTO> processFastestKill (StatisticDTO fastestKillData){
+            
+            List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
+    
+            //  Título de la eliminación más rápida
+            titlesList.add(formatTitle("fastestkill", fastestKillData.getPlayer(), String.format("%.2f", Double.valueOf(fastestKillData.getValue().toString())/64)));
+    
+            return titlesList;
+    }
+
+    private List<FullTitleDTO> processFastestDeath (StatisticDTO fastestDeathData){
+            
+        List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
+
+        //  Título de la eliminación más rápida
+        titlesList.add(formatTitle("fastestkill", fastestDeathData.getPlayer(), String.format("%.2f", Double.valueOf(fastestDeathData.getValue().toString())/64)));
+
+        return titlesList;
+}
+
+    private List<FullTitleDTO> processShots (List<StatisticDTO> shots){
         
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
 
         //  Título de más tiros
         titlesList.add(shots.stream()
         .max((s1, s2) -> Integer.compare(Integer.valueOf(s1.getValue().toString()), Integer.valueOf(s2.getValue().toString())))
-        .map(stat -> buildTitle("mostshots", stat.getPlayer(), String.format("%,d", Integer.valueOf(stat.getValue().toString()))))
-        .orElse(buildTitle("mostshots","-","-")));
+        .map(stat -> formatTitle("mostshots", stat.getPlayer(), String.format("%,d", Integer.valueOf(stat.getValue().toString()))))
+        .orElse(formatTitle("mostshots","-","-")));
 
         //  Título de menos tiros
         titlesList.add(shots.stream()
         .min((s1, s2) -> Integer.compare(Integer.valueOf(s1.getValue().toString()), Integer.valueOf(s2.getValue().toString())))
-        .map(stat -> buildTitle("lessshots", stat.getPlayer(), String.format("%,d", Integer.valueOf(stat.getValue().toString()))))
-        .orElse(buildTitle("lessshots","-","-")));
+        .map(stat -> formatTitle("lessshots", stat.getPlayer(), String.format("%,d", Integer.valueOf(stat.getValue().toString()))))
+        .orElse(formatTitle("lessshots","-","-")));
 
         return titlesList;
     }
 
-    private List<FullTitleDTO> filterBounces (List<StatisticDTO> bouncesData){
+    private List<FullTitleDTO> processBounces (List<StatisticDTO> bouncesData){
         
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
 
         //  Título de más rebotes de granadas
         titlesList.add(bouncesData.stream()
         .max((b1, b2) -> Integer.compare(Integer.valueOf(b1.getValue().toString()), Integer.valueOf(b2.getValue().toString())))
-        .map(stat -> buildTitle("mostgrenadebounces", stat.getPlayer(), String.format("%,d", Integer.valueOf(stat.getValue().toString()))))
-        .orElse(buildTitle("mostgrenadebounces","-","-")));
+        .map(stat -> formatTitle("mostgrenadebounces", stat.getPlayer(), String.format("%,d", Integer.valueOf(stat.getValue().toString()))))
+        .orElse(formatTitle("mostgrenadebounces","-","-")));
 
         return titlesList;
     }
 
-    private List<FullTitleDTO> filterWastes (List<StatisticDTO> playerGrenadeBuysData, List<StatisticDTO> grenadeThrowsData){
+    private List<FullTitleDTO> processWastes (List<StatisticDTO> playerGrenadeBuysData, List<StatisticDTO> grenadeThrowsData){
 
         List<FullTitleDTO> titlesList = new ArrayList<FullTitleDTO>();
         
@@ -988,9 +1004,21 @@ public class TitlesService {
         titlesList.add(wastesMap.entrySet()
             .stream()
             .max(Map.Entry.comparingByValue())
-            .map(entry -> buildTitle("mostunusedgrenades", entry.getKey(), String.format("%,d", entry.getValue())))
-            .orElse(buildTitle("mostunusedgrenades","-","-")));
+            .map(entry -> formatTitle("mostunusedgrenades", entry.getKey(), String.format("%,d", entry.getValue())))
+            .orElse(formatTitle("mostunusedgrenades","-","-")));
 
         return titlesList;
+    }
+
+    // Método para formatear los títulos como un objeto FullTitleDTO
+    private FullTitleDTO formatTitle(String titleCode, String player, Object value){
+        return FullTitleDTO.builder()
+            .title(titles.getTitlesMap().get(titleCode).getTitle())
+            .description(titles.getTitlesMap().get(titleCode).getDescription())
+            .player(player)
+            .icon(titles.getTitlesMap().get(titleCode).getIcon())
+            .valueString(value.equals("-")?"-":
+                (value.toString() + " " + titles.getTitlesMap().get(titleCode).getUnit()))
+            .build();
     }
 }

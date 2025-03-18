@@ -1,12 +1,10 @@
 package com.batistes.kskb.api.service;
 
 import java.sql.Date;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -82,149 +80,155 @@ public class TotalDataService {
     @Autowired
     private Utils utils;
 
-    //TODO: Optimizar método de obtención de datos.
-
     public String getTotalData(Date startDate, Date endDate){
 
         final Logger logger = LoggerFactory.getLogger(TotalDataService.class);
         
         logger.info("Data retrieve start");
+
         List<Players> players = playersRepository.findByNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
+        logger.info("SQL - Players data Finished");
 
-        logger.info("Players data Finished");
         List<Kills> kills = killsRepository.findByKillerNameOrAssisterNameOrVictimNameBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
+        logger.info("SQL - Kills data Finished");
 
-        logger.info("Kills data Finished");        
         List<BombsDefused> bombsDefused = bombsDefusedRepository.findByDefuserNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
+        logger.info("SQL - Bombs defused data Finished");
         
-        logger.info("Bombs defused data Finished");     
         List<BombsPlanted> bombsPlanted = bombsPlantedRepository.findByPlanterNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
-        
-        logger.info("Bombs planted data Finished");
+        logger.info("SQL - Bombs planted data Finished");
+
         List<PlayerEconomies> playerEconomies = playerEconomiesRepository.findByPlayerNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
-  
-        logger.info("Player economies data Finished");  
+        logger.info("SQL - Player economies data Finished");
+        
         List<ChickenDeaths> chickenDeaths = chickenDeathsRepository.findByKillerSteamIdInBetweenDates(
             Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID),
             startDate, endDate);
+        logger.info("SQL - Chicken deaths data Finished");
         
-        logger.info("Chicken deaths data Finished");        
         List<PlayerBlinds> playerBlinds = playerBlindsRepository.findByKillerNameOrAssisterNameOrVictimNameBetweenDates(
             Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID),
             startDate, endDate);
-        
-        logger.info("Player blinds data Finished");
+        logger.info("SQL - Player blinds data Finished");
+
         List<StatisticDTO> shotsData = shotsRepository.countShotsByPlayerNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
-        logger.info("Shots data Finished");
+        logger.info("SQL - Shots data Finished");
 
         List<StatisticDTO> damagesData = damagesRepository.countDamagesByAttackerSteamIdInBetweenDates(
             Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID),
             startDate, endDate);
-        logger.info("Damages data Finished");
+        logger.info("SQL - Damages data Finished");
 
         List<StatisticDTO> allyDamagesData = damagesRepository.sumTeamDamagesByAttackerSteamIdInBetweenDates(
             Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID),
             startDate, endDate);
-        logger.info("Ally damages data Finished");
+        logger.info("SQL - Ally damages data Finished");
 
         List<StatisticDTO> selfDamagesData = damagesRepository.sumSelfDamagesByAttackerSteamIdInBetweenDates(
             Arrays.asList(constants.SHINCHAN_STEAM_ID, constants.NENE_STEAM_ID, constants.KAZAMA_STEAM_ID, constants.MAFIOS_STEAM_ID, constants.SWAGCHAN_STEAM_ID),
             startDate, endDate);
-        logger.info("Self damages data Finished");
+        logger.info("SQL - Self damages data Finished");
 
         List<StatisticDTO> grenadeBouncesData = grenadeBouncesRepository.countBouncesByPlayerNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
-        logger.info("Grenade Bounces data Finished");
+        logger.info("SQL - Grenade Bounces data Finished");
 
         List<StatisticDTO> playerGrenadeBuysData = playerBuysRepository.findGrenadeBuysByPlayerNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
-        logger.info("Player Grenade Buys data Finished");
+        logger.info("SQL - Player Grenade Buys data Finished");
 
         List<StatisticDTO> grenadeThrowsData = grenadeProjectilesDestroyRepository.countGrenadesByThrowerNameInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             startDate, endDate);
-        logger.info("Player Grenade Throws data Finished");
+        logger.info("SQL - Player Grenade Throws data Finished");
 
         List<StatisticDTO> heThrowsData = grenadeProjectilesDestroyRepository.countGrenadesByThrowerNameInAndTypeInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             Arrays.asList("HE Grenade"),
             startDate, endDate);
-        logger.info("Player HE Throws data Finished");
+        logger.info("SQL - Player HE Throws data Finished");
 
         List<StatisticDTO> smokeThrowsData = grenadeProjectilesDestroyRepository.countGrenadesByThrowerNameInAndTypeInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             Arrays.asList("Smoke Grenade"),
             startDate, endDate);
-        logger.info("Player Smoke Throws data Finished");
+        logger.info("SQL - Player Smoke Throws data Finished");
 
         List<StatisticDTO> molotovThrowsData = grenadeProjectilesDestroyRepository.countGrenadesByThrowerNameInAndTypeInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             Arrays.asList("Incendiary Grenade","Molotov"),
             startDate, endDate);
-        logger.info("Player Fires Throws data Finished");
+        logger.info("SQL - Player Fires Throws data Finished");
 
         List<StatisticDTO> decoyThrowsData = grenadeProjectilesDestroyRepository.countGrenadesByThrowerNameInAndTypeInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             Arrays.asList("Decoy Grenade"),
             startDate, endDate);
-        logger.info("Player Decoy Throws data Finished");
+        logger.info("SQL - Player Decoy Throws data Finished");
 
         List<StatisticDTO> flashThrowsData = grenadeProjectilesDestroyRepository.countGrenadesByThrowerNameInAndTypeInBetweenDates(
             Arrays.asList(constants.PLAYER_SHINCHAN, constants.PLAYER_NENE, constants.PLAYER_KAZAMA, constants.PLAYER_MAFIOS, constants.PLAYER_SWAGCHAN),
             Arrays.asList("Flashbang"),
             startDate, endDate);
-        logger.info("Player Flash Throws data Finished");
+        logger.info("SQL - Player Flash Throws data Finished");
 
         logger.info("SQL Finished");
 
         final Map<String, TotalDataDTO> totalData = new HashMap<>();
 
-        totalData.putAll(this.filterKills(kills));
-        totalData.putAll(this.filterPlayers(players));
-        totalData.putAll(this.filterBombsDefused(bombsDefused));
-        totalData.putAll(this.filterBombsPlanted(bombsPlanted));
-        totalData.putAll(this.filterPlayerEconomies(playerEconomies));
-        totalData.putAll(this.filterShots(shotsData, damagesData));
-        totalData.putAll(this.filterChickens(chickenDeaths));
-        totalData.putAll(this.filterBounces(grenadeBouncesData));
-        totalData.putAll(this.filterDamages(allyDamagesData, selfDamagesData));
-        totalData.putAll(this.filterBlinds(playerBlinds));
-        totalData.putAll(this.filterWastes(grenadeThrowsData, playerGrenadeBuysData, 
+        totalData.putAll(this.processKills(kills));
+        logger.info("Kills Processing Finished");
+        totalData.putAll(this.processPlayers(players));
+        logger.info("Players Processing Finished");
+        totalData.putAll(this.processBombsDefused(bombsDefused));
+        logger.info("Bombs Defused Processing Finished");
+        totalData.putAll(this.processBombsPlanted(bombsPlanted));
+        logger.info("Bombs Planted Processing Finished");
+        totalData.putAll(this.processPlayerEconomies(playerEconomies));
+        logger.info("Player Economies Processing Finished");
+        totalData.putAll(this.processShots(shotsData, damagesData));
+        logger.info("Shots Processing Finished");
+        totalData.putAll(this.processChickens(chickenDeaths));
+        logger.info("Chickens Processing Finished");
+        totalData.putAll(this.processBounces(grenadeBouncesData));
+        logger.info("Bounces Processing Finished");
+        totalData.putAll(this.processDamages(allyDamagesData, selfDamagesData));
+        logger.info("Damages Processing Finished");
+        totalData.putAll(this.processBlinds(playerBlinds));
+        logger.info("Blinds Processing Finished");
+        totalData.putAll(this.processWastes(grenadeThrowsData, playerGrenadeBuysData, 
                                            heThrowsData, smokeThrowsData, molotovThrowsData, 
                                            decoyThrowsData, flashThrowsData));
-
+        logger.info("Wastes Processing Finished");
         logger.info("Java process Finished");
         
         //Convertimos el MAP en LIST
-        List<TotalDataDTO> totalDataList = new ArrayList<>();
-        for (Entry<String, TotalDataDTO> entry : totalData.entrySet()) {
-            TotalDataDTO dto = entry.getValue();
-            dto.setData(entry.getKey());
-            totalDataList.add(dto);
-        }
-        
+        List<TotalDataDTO> totalDataList = utils.convertMapToList(totalData);
+
         //Ordenamos la lista
         totalDataList.sort((dto1, dto2) -> Integer.compare(dto1.getCustomOrder(), dto2.getCustomOrder()));
 
         //Convertimos el LIST en un STRING JSON
         String result = Utils.convertToJSON(totalDataList);
 
+        logger.info("Data formatting Finished");
+
         // Liberar referencias a las listas
-        logger.info("Liberando memoria");
+        logger.info("Memory freeing");
         players = null;
         kills = null;
         bombsDefused = null;
@@ -248,7 +252,7 @@ public class TotalDataService {
         return result;
     }
 
-    private Map<String, TotalDataDTO> filterBlinds (List<PlayerBlinds> totalBlinds){
+    private Map<String, TotalDataDTO> processBlinds (List<PlayerBlinds> totalBlinds){
         Map<String, TotalDataDTO> blindsMap = new HashMap<>();
 
         TotalDataDTO blinds = new TotalDataDTO();
@@ -384,7 +388,7 @@ public class TotalDataService {
         return blindsMap;
     }
 
-    private Map<String, TotalDataDTO> filterDamages (List<StatisticDTO> allyDamagesData, List<StatisticDTO> selfDamagesData){
+    private Map<String, TotalDataDTO> processDamages (List<StatisticDTO> allyDamagesData, List<StatisticDTO> selfDamagesData){
         Map<String, TotalDataDTO> damagesMap = new HashMap<>();
         
         TotalDataDTO damages = new TotalDataDTO();
@@ -430,7 +434,7 @@ public class TotalDataService {
         return damagesMap;
     }
 
-    private Map<String, TotalDataDTO> filterBounces (List<StatisticDTO> grenadeBouncesData){
+    private Map<String, TotalDataDTO> processBounces (List<StatisticDTO> grenadeBouncesData){
         Map<String, TotalDataDTO> bouncesMap = new HashMap<>();
 
         TotalDataDTO bounces = new TotalDataDTO();
@@ -456,7 +460,7 @@ public class TotalDataService {
         return bouncesMap;
     }
 
-    private Map<String, TotalDataDTO> filterChickens (List<ChickenDeaths> totalChickenDeaths){
+    private Map<String, TotalDataDTO> processChickens (List<ChickenDeaths> totalChickenDeaths){
         Map<String, TotalDataDTO> chickenMap = new HashMap<>();
 
         TotalDataDTO chickens = new TotalDataDTO();
@@ -482,7 +486,7 @@ public class TotalDataService {
         return chickenMap;
     }
 
-    private Map<String, TotalDataDTO> filterShots (List<StatisticDTO> shotsData, List<StatisticDTO> damagesData){
+    private Map<String, TotalDataDTO> processShots (List<StatisticDTO> shotsData, List<StatisticDTO> damagesData){
         Map<String, TotalDataDTO> shotsMap = new HashMap<>();
 
         TotalDataDTO shots = new TotalDataDTO();
@@ -538,7 +542,7 @@ public class TotalDataService {
         return shotsMap;
     }
 
-    private Map<String, TotalDataDTO> filterPlayerEconomies (List<PlayerEconomies> totalEconomies){
+    private Map<String, TotalDataDTO> processPlayerEconomies (List<PlayerEconomies> totalEconomies){
         Map<String, TotalDataDTO> economiesMap = new HashMap<>();
         
         TotalDataDTO economies = new TotalDataDTO();
@@ -564,7 +568,7 @@ public class TotalDataService {
         return economiesMap;
     }
 
-    private Map<String, TotalDataDTO> filterWastes (List<StatisticDTO> grenadeThrowsData, List<StatisticDTO> grenadeBuysData,
+    private Map<String, TotalDataDTO> processWastes (List<StatisticDTO> grenadeThrowsData, List<StatisticDTO> grenadeBuysData,
                                                     List<StatisticDTO> heThrowsData, List<StatisticDTO> smokeThrowsData, 
                                                     List<StatisticDTO> molotovThrowsData, List<StatisticDTO> decoyThrowsData, 
                                                     List<StatisticDTO> flashThrowsData){
@@ -703,7 +707,7 @@ public class TotalDataService {
         return grenadesMap;
     }
 
-    private Map<String, TotalDataDTO> filterBombsDefused (List<BombsDefused> totalBombsDefused){
+    private Map<String, TotalDataDTO> processBombsDefused (List<BombsDefused> totalBombsDefused){
         Map<String, TotalDataDTO> bombsDefusedMap = new HashMap<>();
 
         TotalDataDTO bombsDefused = new TotalDataDTO();
@@ -729,7 +733,7 @@ public class TotalDataService {
         return bombsDefusedMap;
     }
 
-    private Map<String, TotalDataDTO> filterBombsPlanted (List<BombsPlanted> totalBombsPlanted){
+    private Map<String, TotalDataDTO> processBombsPlanted (List<BombsPlanted> totalBombsPlanted){
         Map<String, TotalDataDTO> bombsPlantedMap = new HashMap<>();
 
         TotalDataDTO bombsPlanted = new TotalDataDTO();
@@ -755,7 +759,7 @@ public class TotalDataService {
         return bombsPlantedMap;
     }
 
-    private Map<String, TotalDataDTO> filterPlayers (List<Players> totalPlayers){
+    private Map<String, TotalDataDTO> processPlayers (List<Players> totalPlayers){
         Map<String, TotalDataDTO> playersMap = new HashMap<>();
 
         TotalDataDTO players = new TotalDataDTO();
@@ -966,7 +970,7 @@ public class TotalDataService {
         return playersMap;
     }
 
-    private Map<String, TotalDataDTO> filterKills (List<Kills> totalKills){
+    private Map<String, TotalDataDTO> processKills (List<Kills> totalKills){
         
         Map<String, TotalDataDTO> killsMap = new HashMap<>();
         

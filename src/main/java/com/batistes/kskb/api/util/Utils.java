@@ -1,10 +1,15 @@
 package com.batistes.kskb.api.util;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.batistes.kskb.api.dto.TotalDataDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 @Component
@@ -73,5 +78,15 @@ public class Utils {
             default:
             return "Unknown Name";
         }
+    }
+
+    public List<TotalDataDTO> convertMapToList(Map<String, TotalDataDTO> totalData) {
+        List<TotalDataDTO> totalDataList = new ArrayList<>();
+        for (Entry<String, TotalDataDTO> entry : totalData.entrySet()) {
+            TotalDataDTO dto = entry.getValue();
+            dto.setData(entry.getKey());
+            totalDataList.add(dto);
+        }
+        return totalDataList;
     }
 }
