@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-alpine
 WORKDIR /app
 
 # Copia todo el código antes de instalar dependencias
-COPY backend .
+COPY . .
 
 # Da permisos de ejecución al wrapper de Maven
 RUN chmod +x ./mvnw
