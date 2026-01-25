@@ -27,7 +27,6 @@ public interface MatchesRepository extends JpaRepository<Matches, String> {
            "MAX(CASE WHEN t.name = 'Team A' THEN t.score END) as teamAScore, " +
            "MAX(CASE WHEN t.name = 'Team B' THEN t.score END) as teamBScore, " +
            "CASE WHEN p.team_name = m.winner_name THEN 'Victoria' ELSE CASE WHEN m.winner_side = 0 THEN 'Empate' ELSE 'Derrota' END END as result, " +
-           "NULL, " +
            "CASE WHEN m.overtime_count > 0 THEN TRUE ELSE FALSE END as overtime " +
            "FROM Matches m JOIN Teams t ON m.checksum = t.match_checksum JOIN Players p ON m.checksum = p.match_checksum " +
            "WHERE p.name IN ('Nene') AND date >= :startDate AND date <= :endDate " +
