@@ -20,7 +20,8 @@ public interface MatchesRepository extends JpaRepository<Matches, String> {
     @Query("SELECT COUNT(m) FROM Matches m WHERE m.winnerName is NULL AND date >= :startDate AND date <= :endDate" )
     public Integer findTies(Date startDate, Date endDate);
 
-    @Query(value ="SELECT m.date as date, " +
+    @Query(value ="SELECT m.checksum as checksum, " +
+           "m.date as date, " +
            "m.map_name as map, " +
            "m.duration as duration, " +
            "MAX(CASE WHEN t.name = 'Team A' THEN t.score END) as teamAScore, " +
@@ -29,7 +30,7 @@ public interface MatchesRepository extends JpaRepository<Matches, String> {
            "CASE WHEN m.overtime_count > 0 THEN TRUE ELSE FALSE END as overtime " +
            "FROM Matches m JOIN Teams t ON m.checksum = t.match_checksum JOIN Players p ON m.checksum = p.match_checksum " +
            "WHERE p.name IN ('Nene') AND date >= :startDate AND date <= :endDate " +
-           "GROUP BY m.date, m.map_name, p.team_name, m.winner_name, m.winner_side, m.overtime_count, m.duration ORDER BY m.date DESC", nativeQuery = true)
+           "GROUP BY m.checksum, m.date, m.map_name, p.team_name, m.winner_name, m.winner_side, m.overtime_count, m.duration ORDER BY m.date DESC", nativeQuery = true)
     public List<MatchDataDTO> getMatchList(Date startDate, Date endDate);
 
     // Query que encuentra el número de partidas en las que el jugador no ha sido el primero en puntuación

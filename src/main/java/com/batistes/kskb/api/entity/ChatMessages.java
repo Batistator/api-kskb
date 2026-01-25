@@ -28,7 +28,7 @@ public class ChatMessages {
     private String message;
 
     @Column(nullable = false)
-    private String senderStreamId;
+    private String senderSteamId;
 
     @Column(nullable = false)
     private String senderName;
