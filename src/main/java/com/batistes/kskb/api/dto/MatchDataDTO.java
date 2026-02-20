@@ -37,9 +37,11 @@ public class MatchDataDTO {
     
     private boolean overtime;
 
+    private String demoFileName;
+
     private List<ChatMessageDTO> chatMessages;
 
-    public MatchDataDTO(String checksum, Instant date, String map, Double duration, Integer teamAScore, Integer teamBScore, String result, boolean overtime) {
+    public MatchDataDTO(String checksum, Instant date, String map, Double duration, Integer teamAScore, Integer teamBScore, String result, boolean overtime, String demoFileName) {
         this.checksum = checksum;
         this.date = Date.from(date);
         this.map = map;
@@ -48,6 +50,7 @@ public class MatchDataDTO {
         this.teamBScore = teamBScore;
         this.result = result;
         this.overtime = overtime;
+        this.demoFileName = demoFileName;
     }
 
     @Override

@@ -39,6 +39,12 @@ public class MatchListService {
         calculateDuration(matchList);
         getMatchChatMessages(matchList);
 
+        for (MatchDataDTO match : matchList) {
+            if(match.getDemoFileName() != null && !match.getDemoFileName().isBlank()){
+                match.setDemoFileName(match.getDemoFileName().concat(".dem"));
+            }
+        }
+
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             return objectMapper.writeValueAsString(matchList);
