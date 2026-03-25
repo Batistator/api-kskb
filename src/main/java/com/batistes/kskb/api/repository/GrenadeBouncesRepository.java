@@ -16,11 +16,11 @@ public interface GrenadeBouncesRepository extends JpaRepository<GrenadeBounces, 
     @Query("SELECT g FROM GrenadeBounces g WHERE g.throwerName IN :players")
     public List<GrenadeBounces> findByThrowerNameIn(@Param("players") List<String>players);
 
-    @Query("SELECT g FROM GrenadeBounces g JOIN Matches m ON g.matchChecksum = m.checksum WHERE m.date BETWEEN :startDate AND :endDate AND (g.throwerName IN :players)")
+    @Query("SELECT g FROM GrenadeBounces g JOIN Matches m ON g.matchChecksum = m.checksum WHERE m.analyzeDate BETWEEN :startDate AND :endDate AND (g.throwerName IN :players)")
     public List<GrenadeBounces> findByThrowerNameInBetweenDates(@Param("players") List<String> players, Date startDate, Date endDate);
 
     @Query("SELECT new com.batistes.kskb.api.dto.StatisticDTO(gb.throwerName, COUNT(gb)) FROM GrenadeBounces gb JOIN Matches m ON gb.matchChecksum = m.checksum " +
-            "WHERE m.date BETWEEN :startDate AND :endDate AND (gb.throwerName IN :players) " +
+            "WHERE m.analyzeDate BETWEEN :startDate AND :endDate AND (gb.throwerName IN :players) " +
             "GROUP BY gb.throwerName")
     List<StatisticDTO> countBouncesByPlayerNameInBetweenDates(List<String> players, Date startDate, Date endDate);
 }

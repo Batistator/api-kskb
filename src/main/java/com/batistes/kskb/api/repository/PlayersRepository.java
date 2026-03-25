@@ -17,6 +17,6 @@ public interface PlayersRepository extends JpaRepository<Players, Long> {
 
     List<Players> findPlayersByName(String name);
 
-    @Query("SELECT p FROM Players p JOIN Matches m ON p.matchChecksum = m.checksum WHERE m.date BETWEEN :startDate AND :endDate AND (p.name IN :players)")
+    @Query("SELECT p FROM Players p JOIN Matches m ON p.matchChecksum = m.checksum WHERE m.analyzeDate BETWEEN :startDate AND :endDate AND (p.name IN :players)")
     public List<Players> findByNameInBetweenDates(List<String>players, Date startDate, Date endDate);
 }

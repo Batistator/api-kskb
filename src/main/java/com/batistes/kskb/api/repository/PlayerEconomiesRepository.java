@@ -13,6 +13,6 @@ import org.springframework.stereotype.Repository;
 public interface PlayerEconomiesRepository extends JpaRepository<PlayerEconomies, Long> {
     List<PlayerEconomies> findByPlayerNameIn(List<String> players);
 
-    @Query("SELECT p FROM PlayerEconomies p JOIN Matches m ON p.matchChecksum = m.checksum WHERE m.date BETWEEN :startDate AND :endDate AND (p.playerName IN :players)")
+    @Query("SELECT p FROM PlayerEconomies p JOIN Matches m ON p.matchChecksum = m.checksum WHERE m.analyzeDate BETWEEN :startDate AND :endDate AND (p.playerName IN :players)")
     List<PlayerEconomies> findByPlayerNameInBetweenDates(List<String> players, Date startDate, Date endDate);
 }

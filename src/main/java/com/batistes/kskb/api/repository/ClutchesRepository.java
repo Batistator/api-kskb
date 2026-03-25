@@ -11,6 +11,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ClutchesRepository extends JpaRepository<Clutches, Long> {
-    @Query("SELECT c FROM Clutches c JOIN Matches m ON c.matchChecksum = m.checksum WHERE m.date BETWEEN :startDate AND :endDate AND (c.clutcherName IN :players)")
+    @Query("SELECT c FROM Clutches c JOIN Matches m ON c.matchChecksum = m.checksum WHERE m.analyzeDate BETWEEN :startDate AND :endDate AND (c.clutcherName IN :players)")
     List<Clutches> findByClutcherNameInBetweenDates(List<String> players, Date startDate, Date endDate);
 }

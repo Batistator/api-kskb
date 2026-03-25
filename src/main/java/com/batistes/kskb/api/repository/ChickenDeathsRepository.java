@@ -13,6 +13,6 @@ import org.springframework.stereotype.Repository;
 public interface ChickenDeathsRepository extends JpaRepository<ChickenDeaths, Long> {
     List<ChickenDeaths> findByKillerSteamIdIn(List<String> playerIds);
 
-    @Query("SELECT c FROM ChickenDeaths c JOIN Matches m ON c.matchChecksum = m.checksum WHERE m.date BETWEEN :startDate AND :endDate AND (c.killerSteamId IN :playerIds)")
+    @Query("SELECT c FROM ChickenDeaths c JOIN Matches m ON c.matchChecksum = m.checksum WHERE m.analyzeDate BETWEEN :startDate AND :endDate AND (c.killerSteamId IN :playerIds)")
     List<ChickenDeaths> findByKillerSteamIdInBetweenDates(List<String> playerIds, Date startDate, Date endDate);
 }

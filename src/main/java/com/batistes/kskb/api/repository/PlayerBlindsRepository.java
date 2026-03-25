@@ -15,6 +15,6 @@ public interface PlayerBlindsRepository extends JpaRepository<PlayerBlinds, Long
     @Query("SELECT p FROM PlayerBlinds p WHERE p.flasherSteamId IN :playerIds OR p.flashedSteamId IN :playerIds")
     public List<PlayerBlinds> findByKillerNameOrAssisterNameOrVictimName(@Param("playerIds") List<String>players);
 
-    @Query("SELECT p FROM PlayerBlinds p JOIN Matches m ON p.matchChecksum = m.checksum WHERE m.date BETWEEN :startDate AND :endDate AND (p.flasherSteamId IN :playerIds OR p.flashedSteamId IN :playerIds)")
+    @Query("SELECT p FROM PlayerBlinds p JOIN Matches m ON p.matchChecksum = m.checksum WHERE m.analyzeDate BETWEEN :startDate AND :endDate AND (p.flasherSteamId IN :playerIds OR p.flashedSteamId IN :playerIds)")
     public List<PlayerBlinds> findByKillerNameOrAssisterNameOrVictimNameBetweenDates(@Param("playerIds") List<String>players, Date startDate, Date endDate);
 }

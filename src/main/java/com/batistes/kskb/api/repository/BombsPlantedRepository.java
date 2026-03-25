@@ -14,6 +14,6 @@ public interface BombsPlantedRepository extends JpaRepository<BombsPlanted, Long
     
     List<BombsPlanted> findByPlanterNameIn(List<String> players);
 
-    @Query("SELECT b FROM BombsPlanted b JOIN Matches m ON b.matchChecksum = m.checksum WHERE m.date BETWEEN :startDate AND :endDate AND (b.planterName IN :players)")
+    @Query("SELECT b FROM BombsPlanted b JOIN Matches m ON b.matchChecksum = m.checksum WHERE m.analyzeDate BETWEEN :startDate AND :endDate AND (b.planterName IN :players)")
     List<BombsPlanted> findByPlanterNameInBetweenDates(List<String> players, Date startDate, Date endDate);
 }

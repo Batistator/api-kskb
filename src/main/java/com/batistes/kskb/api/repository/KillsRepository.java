@@ -29,19 +29,19 @@ public interface KillsRepository extends JpaRepository<Kills, Long> {
     public List<Kills> findByKillerNameOrAssisterNameOrVictimName(@Param("players") List<String>players);
 
     @Query("SELECT k FROM Kills k JOIN Matches m ON k.matchChecksum = m.checksum WHERE " +
-        "m.date BETWEEN :startDate AND :endDate AND " +
+        "m.analyzeDate BETWEEN :startDate AND :endDate AND " +
         "(k.killerName IN :players OR k.assisterName IN :players OR k.victimName IN :players)")
     public List<Kills> findByKillerNameOrAssisterNameOrVictimNameBetweenDates(@Param("players") List<String>players, Date startDate, Date endDate);
 
     public List<Kills> findByKillerNameAndKillerSide(String player, Integer side);
 
     @Query("SELECT k FROM Kills k JOIN Matches m ON k.matchChecksum = m.checksum WHERE " +
-        "m.date BETWEEN :startDate AND :endDate AND k.killerName IN (:players) AND k.weaponName != 'World'")
+        "m.analyzeDate BETWEEN :startDate AND :endDate AND k.killerName IN (:players) AND k.weaponName != 'World'")
     public List<Kills> findByKillerNameBetweenDates(@Param("players") List<String>players, Date startDate, Date endDate);
 
 
     @Query("SELECT new com.batistes.kskb.api.dto.WeaponCounterDTO(k.killerName, COUNT(DISTINCT k.weaponName)) FROM Kills k JOIN " +
-        "Matches m ON k.matchChecksum = m.checksum WHERE m.date BETWEEN :startDate AND :endDate AND " + 
+        "Matches m ON k.matchChecksum = m.checksum WHERE m.analyzeDate BETWEEN :startDate AND :endDate AND " + 
         "k.killerName IN (:players) and k.weaponName != 'World' GROUP BY k.killerName")
     public List<WeaponCounterDTO> countDistinctWeaponKillsByPlayers(@Param("players") List<String>players, Date startDate, Date endDate);
 
@@ -50,14 +50,14 @@ public interface KillsRepository extends JpaRepository<Kills, Long> {
     @Query("SELECT new com.batistes.kskb.api.dto.StatisticDTO(k.killerName, (k.tick - r.freezeTimeEndTick) as value) from Kills k " + 
         "join Matches m on k.matchChecksum = m.checksum " +
         "join Rounds r on k.matchChecksum = r.matchChecksum " +
-        "where m.date >= :startDate and m.date < :endDate and killerName in (:players) " +
+        "where m.analyzeDate >= :startDate and m.analyzeDate < :endDate and killerName in (:players) " +
         "and victimName not in (:players) and r.number = k.roundNumber order by value asc limit 1")
     public StatisticDTO findFastestKillTitle(@Param("players") List<String>players, Date startDate, Date endDate);
 
     @Query("SELECT new com.batistes.kskb.api.dto.StatisticDTO(k.victimName, (k.tick - r.freezeTimeEndTick) as value) from Kills k " + 
         "join Matches m on k.matchChecksum = m.checksum " +
         "join Rounds r on k.matchChecksum = r.matchChecksum " +
-        "where m.date >= :startDate and m.date < :endDate and victimName in (:players) " +
+        "where m.analyzeDate >= :startDate and m.analyzeDate < :endDate and victimName in (:players) " +
         "and killerName not in (:players) and r.number = k.roundNumber order by value asc limit 1")
     public StatisticDTO findFastestDeathTitle(@Param("players") List<String>players, Date startDate, Date endDate);
 }

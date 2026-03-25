@@ -14,11 +14,11 @@ import org.springframework.stereotype.Repository;
 public interface ShotsRepository extends JpaRepository<Shots, Long> {
     List<Shots> findByPlayerNameIn(List<String> players);
 
-    @Query("SELECT s FROM Shots s JOIN Matches m ON s.matchChecksum = m.checksum WHERE m.date BETWEEN :startDate AND :endDate AND (s.playerName IN :players)")
+    @Query("SELECT s FROM Shots s JOIN Matches m ON s.matchChecksum = m.checksum WHERE m.analyzeDate BETWEEN :startDate AND :endDate AND (s.playerName IN :players)")
     List<Shots> findByPlayerNameInBetweenDates(List<String> players, Date startDate, Date endDate);
 
     @Query("SELECT new com.batistes.kskb.api.dto.StatisticDTO(s.playerName, COUNT(s)) FROM Shots s JOIN Matches m ON s.matchChecksum = m.checksum " +
-            "WHERE m.date BETWEEN :startDate AND :endDate AND (s.playerName IN :players) " +
+            "WHERE m.analyzeDate BETWEEN :startDate AND :endDate AND (s.playerName IN :players) " +
             "AND s.weaponName NOT IN ('HE Grenade', 'Incendiary Grenade', 'Molotov') GROUP BY s.playerName")
     List<StatisticDTO> countShotsByPlayerNameInBetweenDates(List<String> players, Date startDate, Date endDate);
 

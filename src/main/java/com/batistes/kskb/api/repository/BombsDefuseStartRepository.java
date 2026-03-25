@@ -13,6 +13,6 @@ import org.springframework.stereotype.Repository;
 public interface BombsDefuseStartRepository extends JpaRepository<BombsDefuseStart, Long> {
     Integer countBombsPlantedByDefuserName(String player);
 
-    @Query("SELECT bd FROM BombsDefuseStart bd JOIN Matches m ON bd.matchChecksum = m.checksum WHERE m.date BETWEEN :startDate AND :endDate AND (bd.defuserName IN :players)")
+    @Query("SELECT bd FROM BombsDefuseStart bd JOIN Matches m ON bd.matchChecksum = m.checksum WHERE m.analyzeDate BETWEEN :startDate AND :endDate AND (bd.defuserName IN :players)")
     List<BombsDefuseStart> findByDefuserNameInBetweenDates(List<String> players, Date startDate, Date endDate);
 }

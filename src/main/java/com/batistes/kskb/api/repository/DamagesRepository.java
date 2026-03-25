@@ -17,21 +17,21 @@ public interface DamagesRepository extends JpaRepository<Damages, Long> {
     @Query("SELECT d FROM Damages d WHERE d.attackerSteamId IN :playerIds OR d.victimSteamId IN :playerIds")
     public List<Damages> findByAttackerSteamIdOrVictimSteamIdIn(@Param("playerIds") List<String>playerIds);
 
-    @Query("SELECT d FROM Damages d JOIN Matches m ON d.matchChecksum = m.checksum WHERE m.date BETWEEN :startDate AND :endDate AND (d.attackerSteamId IN :playerIds OR d.victimSteamId IN :playerIds)")
+    @Query("SELECT d FROM Damages d JOIN Matches m ON d.matchChecksum = m.checksum WHERE m.analyzeDate BETWEEN :startDate AND :endDate AND (d.attackerSteamId IN :playerIds OR d.victimSteamId IN :playerIds)")
     public List<Damages> findByAttackerSteamIdOrVictimSteamIdInBetweenDates(@Param("playerIds") List<String>playerIds, Date startDate, Date endDate);
 
     @Query("SELECT new com.batistes.kskb.api.dto.StatisticDTO(d.attackerSteamId, COUNT(d)) as value FROM Damages d JOIN Matches m ON d.matchChecksum = m.checksum " +
-            "WHERE m.date BETWEEN :startDate AND :endDate AND (d.attackerSteamId IN :players) " +
+            "WHERE m.analyzeDate BETWEEN :startDate AND :endDate AND (d.attackerSteamId IN :players) " +
             "AND d.weaponType != 'grenade' GROUP BY d.attackerSteamId")
     List<StatisticDTO> countDamagesByAttackerSteamIdInBetweenDates(List<String> players, Date startDate, Date endDate);
 
     @Query("SELECT new com.batistes.kskb.api.dto.StatisticDTO(d.attackerSteamId, SUM(d.healthDamage + d.armorDamage)) as value FROM Damages d JOIN Matches m ON d.matchChecksum = m.checksum " +
-            "WHERE m.date BETWEEN :startDate AND :endDate AND (d.attackerSteamId IN :players) " +
+            "WHERE m.analyzeDate BETWEEN :startDate AND :endDate AND (d.attackerSteamId IN :players) " +
             "AND (d.victimSteamId IN :players) GROUP BY d.attackerSteamId")
     List<StatisticDTO> sumTeamDamagesByAttackerSteamIdInBetweenDates(List<String> players, Date startDate, Date endDate);
 
     @Query("SELECT new com.batistes.kskb.api.dto.StatisticDTO(d.attackerSteamId, SUM(d.healthDamage + d.armorDamage)) as value FROM Damages d JOIN Matches m ON d.matchChecksum = m.checksum " +
-            "WHERE m.date BETWEEN :startDate AND :endDate AND d.attackerSteamId = d.victimSteamId " +
+            "WHERE m.analyzeDate BETWEEN :startDate AND :endDate AND d.attackerSteamId = d.victimSteamId " +
             "AND d.attackerSteamId IN :players GROUP BY d.attackerSteamId")
     List<StatisticDTO> sumSelfDamagesByAttackerSteamIdInBetweenDates(List<String> players, Date startDate, Date endDate);
 }

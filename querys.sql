@@ -629,14 +629,14 @@ select 'The Mafios' as Nombre, (
 
 
 
-select TO_CHAR(m.date at time zone 'GMT-1', 'YYYY-MM-DD HH24:MI') as fecha, m.map_name as mapa, 
-CONCAT(ROUND(m.duration/60),' min') as duración,
+select TO_CHAR(m.analyze_date at time zone 'GMT-1', 'YYYY-MM-DD HH24:MI') as fecha, d.map_name as mapa, 
+CONCAT(ROUND(d.duration/60),' min') as duración,
 MAX(CASE WHEN t."name" = 'Team A' THEN t.score END) AS "equipo A",
 MAX(CASE WHEN t."name" = 'Team B' THEN t.score END) AS "equipo B",
 case when p.team_name = m.winner_name then 'VICTORIA' else case when m.winner_side = 0 then 'EMPATE' else 'DERROTA' end end as resultado,
 case when m.overtime_count > 0 then 'Prórroga' else '' end as " "
-from matches m join players p on m.checksum = p.match_checksum  join teams t on t.match_checksum = m.checksum 
-where p."name" = 'Nene' group by m.date, m.map_name, p.team_name, m.winner_name, m.winner_side, m.overtime_count,m.duration  order by m.date desc
+from matches m join players p on m.checksum = p.match_checksum  join teams t on t.match_checksum = m.checksum join demos d on t.match_checksum = m.checksum 
+where p."name" = 'Nene' group by m.analyze_date, d.map_name, p.team_name, m.winner_name, m.winner_side, m.overtime_count,d.duration  order by m.analyze_date desc
  
 
 
@@ -753,11 +753,11 @@ Kazama	76561198020496882
 
 
 
-select TO_CHAR(m.date at time zone 'GMT-1', 'YYYY-MM-DD HH24:MI') as fecha, m.map_name as mapa, 
-CONCAT(ROUND(m.duration/60),' min') as duración,
+select TO_CHAR(m.analyze_date at time zone 'GMT-1', 'YYYY-MM-DD HH24:MI') as fecha, d.map_name as mapa, 
+CONCAT(ROUND(d.duration/60),' min') as duración,
 MAX(CASE WHEN t."name" = 'Team A' THEN t.score END) AS "equipo A",
 MAX(CASE WHEN t."name" = 'Team B' THEN t.score END) AS "equipo B",
 case when p.team_name = m.winner_name then 'VICTORIA' else case when m.winner_side = 0 then 'EMPATE' else 'DERROTA' end end as resultado,
 case when m.overtime_count > 0 then 'Prórroga' else '' end as " "
-from matches m join players p on m.checksum = p.match_checksum  join teams t on t.match_checksum = m.checksum 
-where p."name" = 'Nene' group by m.date, m.map_name, p.team_name, m.winner_name, m.winner_side, m.overtime_count,m.duration  order by m.date desc
+from matches m join players p on m.checksum = p.match_checksum  join teams t on t.match_checksum = m.checksum join demos d on t.match_checksum = m.checksum 
+where p."name" = 'Nene' group by m.analyze_date, d.map_name, p.team_name, m.winner_name, m.winner_side, m.overtime_count,d.duration  order by m.analyze_date desc

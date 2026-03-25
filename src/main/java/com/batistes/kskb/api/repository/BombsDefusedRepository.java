@@ -14,6 +14,6 @@ public interface BombsDefusedRepository extends JpaRepository<BombsDefused, Long
     List<BombsDefused> findByDefuserNameIn(List<String> players);
 
 
-    @Query("SELECT b FROM BombsDefused b JOIN Matches m ON b.matchChecksum = m.checksum WHERE m.date BETWEEN :startDate AND :endDate AND (b.defuserName IN :players)")
+    @Query("SELECT b FROM BombsDefused b JOIN Matches m ON b.matchChecksum = m.checksum WHERE m.analyzeDate BETWEEN :startDate AND :endDate AND (b.defuserName IN :players)")
     List<BombsDefused> findByDefuserNameInBetweenDates(List<String> players, Date startDate, Date endDate);
 }
